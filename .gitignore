@@ -1,0 +1,4 @@
+scripts/backend/.env
+scripts/backend/node_modules/
+*.zip
+dist/

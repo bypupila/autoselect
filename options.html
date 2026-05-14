@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoSelect Pro — Opciones</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"/>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+        </div>
+        <div>
+          <div class="sidebar-name">AutoSelect <span>Pro</span></div>
+          <div class="sidebar-version">v1.1.0</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#general" class="nav-item active" data-section="general">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+          General
+        </a>
+        <a href="#visual" class="nav-item" data-section="visual">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Visual
+        </a>
+        <a href="#sites" class="nav-item" data-section="sites">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Sitios excluidos
+        </a>
+        <a href="#stats" class="nav-item" data-section="stats">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Estadísticas
+        </a>
+        <a href="#license" class="nav-item" data-section="license">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v5"/><rect x="3" y="12" width="18" height="9" rx="2"/><path d="M8 16h8"/></svg>
+          Licencia
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="quick-toggle-row">
+          <span>Extensión</span>
+          <label class="toggle" for="sidebarToggle">
+            <input type="checkbox" id="sidebarToggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="options-main">
+      <div class="options-header">
+        <h1 class="page-title" id="pageTitle">General</h1>
+        <div class="save-indicator" id="saveIndicator">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          Guardado
+        </div>
+      </div>
+
+      <!-- ─── General Section ─────────────────────────────────── -->
+      <section id="section-general" class="options-section active">
+        <div class="card">
+          <div class="card-title">Comportamiento</div>
+          <div class="form-group">
+            <label class="form-label">Mínimo de caracteres para copiar</label>
+            <div class="form-desc">No copiará selecciones más cortas que esto</div>
+            <div class="input-row">
+              <input type="range" id="minChars" min="1" max="20" value="1" class="slider">
+              <span class="slider-value" id="minCharsValue">1</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tiempo de espera (Cooldown)</label>
+            <div class="form-desc">Segundos a esperar antes de permitir copiar de nuevo</div>
+            <div class="input-row">
+              <input type="range" id="cooldown" min="0" max="10" step="0.5" value="0" class="slider">
+              <span class="slider-value" id="cooldownValue">0s</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div>
+                <label class="form-label">Copiar al arrastrar</label>
+                <div class="form-desc">Copia el texto cuando lo seleccionas arrastrando el mouse</div>
+              </div>
+              <label class="toggle" for="copyOnSelect">
+                <input type="checkbox" id="copyOnSelect" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div>
+                <label class="form-label">Copiar al hacer doble clic</label>
+                <div class="form-desc">Copia el texto inmediatamente al hacer doble clic en una palabra</div>
+              </div>
+              <label class="toggle" for="copyOnDoubleClick" checked>
+                <input type="checkbox" id="copyOnDoubleClick" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div>
+                <label class="form-label">Soporte de PDFs</label>
+                <div class="form-desc">Activar auto-copy en PDFs abiertos en Chrome</div>
+              </div>
+              <label class="toggle" for="pdfMode">
+                <input type="checkbox" id="pdfMode" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div>
+                <label class="form-label">Sonido al copiar</label>
+                <div class="form-desc">Tono sutil de confirmación</div>
+              </div>
+              <label class="toggle" for="soundEnabled">
+                <input type="checkbox" id="soundEnabled">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Visual Section ─────────────────────────────────── -->
+      <section id="section-visual" class="options-section">
+        <div class="card">
+          <div class="card-title">Highlight de selección</div>
+          <div class="form-group">
+            <label class="form-label">Color del highlight</label>
+            <div class="form-desc">Color que aparece sobre el texto copiado</div>
+            <div class="color-row">
+              <input type="color" id="highlightColor" class="color-full" value="#10b981">
+              <div class="color-presets">
+                <button class="preset-color" data-color="#10b981" style="background:#10b981" title="Esmeralda"></button>
+                <button class="preset-color" data-color="#6366f1" style="background:#6366f1" title="Índigo"></button>
+                <button class="preset-color" data-color="#f59e0b" style="background:#f59e0b" title="Ámbar"></button>
+                <button class="preset-color" data-color="#ec4899" style="background:#ec4899" title="Rosa"></button>
+                <button class="preset-color" data-color="#3b82f6" style="background:#3b82f6" title="Azul"></button>
+                <button class="preset-color" data-color="#a855f7" style="background:#a855f7" title="Púrpura"></button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Opacidad del highlight</label>
+            <div class="form-desc">Transparencia del color de fondo</div>
+            <div class="input-row">
+              <input type="range" id="highlightOpacity" min="0.1" max="0.8" step="0.05" value="0.35" class="slider">
+              <span class="slider-value" id="opacityValue">35%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duración del highlight</label>
+            <div class="form-desc">Tiempo que permanece visible el color</div>
+            <div class="input-row">
+              <input type="range" id="highlightDuration" min="500" max="5000" step="100" value="1500" class="slider">
+              <span class="slider-value" id="durationValue">1.5s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Indicador de copia (✓)</div>
+          <div class="form-group">
+            <label class="form-label">Posición del indicador</label>
+            <div class="position-grid" id="positionGrid">
+              <button class="position-btn active" data-value="cursor">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-7 1-3 7z"/></svg>
+                Cursor
+              </button>
+              <button class="position-btn" data-value="corner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V9h8"/></svg>
+                Esquina
+              </button>
+              <button class="position-btn" data-value="both">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-7 1-3 7z"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+                Ambos
+              </button>
+              <button class="position-btn" data-value="none">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Ninguno
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview -->
+        <div class="card preview-card">
+          <div class="card-title">Vista previa</div>
+          <div class="preview-area">
+            <p class="preview-text">
+              Selecciona este texto para ver el efecto del highlight en acción.
+              <span class="preview-highlight" id="previewHighlight">Este texto mostrará el color elegido.</span>
+              La extensión copiará automáticamente lo que selecciones.
+            </p>
+            <div class="preview-checkmark" id="previewCheckmark">
+              <div class="preview-check-icon">
+                <svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+              </div>
+              Copiado
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Sites Section ──────────────────────────────────── -->
+      <section id="section-sites" class="options-section">
+        <div class="card">
+          <div class="card-title">Sitios excluidos</div>
+          <div class="form-desc" style="margin-bottom: 16px;">La extensión no funcionará en estos dominios</div>
+          <div class="blacklist-input-row">
+            <input type="text" id="blacklistInput" placeholder="ej: google.com, notion.so" class="text-input">
+            <button class="btn-add" id="btnAddSite">Agregar</button>
+          </div>
+          <div class="blacklist-list" id="blacklistList">
+            <!-- Populated by JS -->
+          </div>
+          <div class="empty-state" id="blacklistEmpty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            <span>No hay sitios excluidos</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Stats Section ──────────────────────────────────── -->
+      <section id="section-stats" class="options-section">
+        <div class="stats-grid">
+          <div class="stat-big-card">
+            <div class="stat-big-value" id="statTotal">0</div>
+            <div class="stat-big-label">Total de textos copiados</div>
+            <div class="stat-big-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </div>
+          </div>
+          <div class="stat-big-card">
+            <div class="stat-big-value accent" id="statSession">0</div>
+            <div class="stat-big-label">Esta sesión</div>
+            <div class="stat-big-icon accent">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Acciones</div>
+          <button class="btn-danger" id="btnResetStats">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Resetear estadísticas
+          </button>
+        </div>
+      </section>
+
+      <section id="section-license" class="options-section">
+        <div class="license-hero">
+          <div class="license-hero-main">
+            <div class="license-eyebrow">Tu cuenta</div>
+            <div class="license-title-row">
+              <h2 id="licensePlanText">AutoSelect Free</h2>
+              <span class="license-badge" id="licenseBadge">FREE</span>
+            </div>
+            <p id="licenseStatusText">50 copias automáticas disponibles por día.</p>
+          </div>
+          <div class="license-meter" id="licenseMeter">
+            <div class="license-meter-value" id="licenseMeterValue">50</div>
+            <div class="license-meter-label" id="licenseMeterLabel">copias restantes hoy</div>
+          </div>
+        </div>
+
+        <div class="license-grid">
+          <button class="license-action primary" id="btnStartTrial">
+            <span>Iniciar trial</span>
+            <strong>3 días Pro</strong>
+          </button>
+          <button class="license-action" id="btnRevalidateLicense">
+            <span>Sincronizar</span>
+            <strong>Revalidar acceso</strong>
+          </button>
+        </div>
+
+        <div class="license-message" id="licenseMessage" aria-live="polite"></div>
+
+        <div class="card license-card">
+          <div>
+            <div class="card-title">Comprar Pro</div>
+            <p class="license-copy">El checkout se abre en Polar mediante una acción explícita del usuario. Después de comprar, vuelve aquí para activar con tu license key.</p>
+          </div>
+
+          <div class="license-grid purchase-grid">
+            <button class="license-action purchase" id="btnBuyEarlyBird">
+              <span>Early Bird</span>
+              <strong>$14.99 lifetime</strong>
+            </button>
+            <button class="license-action purchase" id="btnBuyLifetime">
+              <span>Lifetime</span>
+              <strong>$19.99 único</strong>
+            </button>
+            <button class="license-action purchase" id="btnBuyAnnual">
+              <span>Anual</span>
+              <strong>$12.00/año</strong>
+            </button>
+          </div>
+        </div>
+
+        <div class="card license-card">
+          <div>
+            <div class="card-title">Activar Pro</div>
+            <p class="license-copy">Usa el email de compra y tu license key. Si tienes un código promocional, puedes aplicarlo desde el mismo formulario.</p>
+          </div>
+
+          <div class="license-form-grid">
+            <label class="license-field">
+              <span>Email de compra</span>
+              <input type="email" id="licenseEmailInput" placeholder="tu@email.com" class="text-input">
+            </label>
+            <label class="license-field">
+              <span>License key</span>
+              <input type="text" id="licenseKeyInput" placeholder="Polar license key" class="text-input">
+            </label>
+            <label class="license-field wide">
+              <span>Código promocional</span>
+              <input type="text" id="couponCodeInput" placeholder="Opcional" class="text-input">
+            </label>
+          </div>
+
+          <label class="license-consent" for="marketingConsent">
+            <input type="checkbox" id="marketingConsent">
+            <span>Acepto recibir novedades, mejoras y ofertas de AutoSelect Pro por email.</span>
+          </label>
+
+          <div class="license-button-row">
+            <button class="btn-add license-primary-btn" id="btnActivateLicense">Activar con license key</button>
+            <button class="btn-add license-secondary-btn" id="btnActivateCoupon">Aplicar código</button>
+          </div>
+        </div>
+
+        <div class="card license-card">
+          <div>
+            <div class="card-title">Configuración avanzada</div>
+            <p class="license-copy">Solo necesitas tocar esto si cambias el backend o las URLs legales antes de publicar.</p>
+          </div>
+          <label class="license-field wide">
+            <span>API Base URL</span>
+            <input type="text" id="apiBaseUrl" placeholder="https://api.tudominio.com" class="text-input">
+          </label>
+          <div class="license-form-grid">
+            <label class="license-field">
+              <span>Checkout Early Bird</span>
+              <input type="text" id="checkoutEarlyBirdUrl" placeholder="https://polar.sh/..." class="text-input">
+            </label>
+            <label class="license-field">
+              <span>Checkout Lifetime</span>
+              <input type="text" id="checkoutLifetimeUrl" placeholder="https://polar.sh/..." class="text-input">
+            </label>
+            <label class="license-field">
+              <span>Checkout Anual</span>
+              <input type="text" id="checkoutAnnualUrl" placeholder="https://polar.sh/..." class="text-input">
+            </label>
+            <label class="license-field">
+              <span>Política de Privacidad</span>
+              <input type="text" id="privacyUrl" placeholder="https://..." class="text-input">
+            </label>
+            <label class="license-field">
+              <span>Términos</span>
+              <input type="text" id="termsUrl" placeholder="https://..." class="text-input">
+            </label>
+          </div>
+          <div class="license-button-row">
+            <button class="btn-add license-secondary-btn" id="btnSaveBackend">Guardar configuración</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

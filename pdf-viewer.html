@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoSelect Pro — Visor PDF</title>
+  <script src="pdf.min.js"></script>
+  <link rel="stylesheet" href="pdf-viewer.css">
+</head>
+<body>
+  <div class="drop-overlay" id="dropOverlay">
+    <div class="drop-content">
+      <svg viewBox="0 0 64 64" fill="none" width="80" height="80">
+        <rect x="8" y="4" width="40" height="52" rx="4" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="2"/>
+        <path d="M28 4v16h16" stroke="#10b981" stroke-width="2"/>
+        <path d="M24 34l8-10 8 10M32 24v20" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>Suelta el PDF aquí</div>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">AutoSelect <span>Pro</span></div>
+          <div class="brand-sub">PDF Viewer</div>
+        </div>
+      </div>
+
+      <input type="file" id="fileInput" accept=".pdf" style="display:none">
+      <div class="upload-zone" id="uploadZone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="28" height="28">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14,2 14,8 20,8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <polyline points="9,15 12,12 15,15"/>
+        </svg>
+        <div class="upload-text">Subir PDF</div>
+        <div class="upload-hint">o arrastra aquí</div>
+      </div>
+
+      <div class="file-info" id="fileInfo" style="display:none">
+        <div class="file-name" id="fileName"></div>
+        <div class="file-pages" id="filePages"></div>
+      </div>
+
+      <div id="controls" style="display:none">
+        <div class="section-label">Navegación</div>
+        <div class="page-nav">
+          <button class="nav-btn" id="btnPrev">‹</button>
+          <div class="page-counter"><span id="currentPage">1</span> / <span id="totalPages">1</span></div>
+          <button class="nav-btn" id="btnNext">›</button>
+        </div>
+        <div class="goto-row">
+          <span>Ir a página</span>
+          <input type="number" id="gotoPage" class="goto-input" min="1" value="1">
+        </div>
+
+        <div class="section-label" style="margin-top:16px">Zoom</div>
+        <div class="zoom-row">
+          <button class="zoom-btn" id="btnZoomOut">−</button>
+          <span class="zoom-val" id="zoomValue">125%</span>
+          <button class="zoom-btn" id="btnZoomIn">+</button>
+        </div>
+        <div class="zoom-presets">
+          <button class="zp" data-z="0.75">75%</button>
+          <button class="zp" data-z="1">100%</button>
+          <button class="zp active" data-z="1.25">125%</button>
+          <button class="zp" data-z="1.5">150%</button>
+          <button class="zp" data-z="2">200%</button>
+        </div>
+
+        <div class="copy-tip">
+          <svg viewBox="0 0 16 16" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+            <path d="M8 1L2 4v4c0 3.5 2.5 6.5 6 7.5 3.5-1 6-4 6-7.5V4L8 1z"/>
+          </svg>
+          Hover = resalta bloque<br>Click = copia al instante
+        </div>
+
+        <!-- Selection mode selector -->
+        <div class="section-label" style="margin-top:16px">Modo de Selección</div>
+        <div class="mode-selector" id="modeSelector">
+          <button class="mode-btn active" data-mode="block" title="Bloque de texto">
+            <span class="mode-icon">⬛</span>Bloque
+          </button>
+          <button class="mode-btn" data-mode="paragraph" title="Párrafo (mismo formato)">
+            <span class="mode-icon">¶</span>Párrafo
+          </button>
+          <button class="mode-btn" data-mode="line" title="Línea de texto">
+            <span class="mode-icon">▬</span>Línea
+          </button>
+          <button class="mode-btn" data-mode="word" title="Palabra individual">
+            <span class="mode-icon">◾</span>Palabra
+          </button>
+          <button class="mode-btn" data-mode="free" title="Selección libre con mouse">
+            <span class="mode-icon">✏️</span>Libre
+          </button>
+        </div>
+
+        <!-- Content Filters -->
+        <div class="section-label" style="margin-top:16px">Filtros de Extracción</div>
+        <div class="filter-container">
+          <button class="filter-btn" data-filter="onlyNums" title="Extraer únicamente números">Solo Números</button>
+          <button class="filter-btn" data-filter="noNums" title="Ignorar todos los números">Sin Números</button>
+          <button class="filter-btn" data-filter="noSpecial" title="Solo letras y números (sin símbolos)">Sin Símbolos</button>
+        </div>
+
+        <div class="stat-row">
+          <span class="stat-num" id="statCopied">0</span>
+          <span class="stat-lbl">textos copiados</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="viewer-main" id="viewerMain">
+      <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+          <svg viewBox="0 0 120 120" fill="none" width="140" height="140">
+            <circle cx="60" cy="60" r="58" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.2)" stroke-width="2"/>
+            <rect x="30" y="20" width="50" height="65" rx="5" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-width="2"/>
+            <path d="M45 20v20h20" stroke="#10b981" stroke-width="2"/>
+            <line x1="38" y1="55" x2="70" y2="55" stroke="#10b981" stroke-width="2" opacity="0.5"/>
+            <line x1="38" y1="63" x2="70" y2="63" stroke="#10b981" stroke-width="2" opacity="0.5"/>
+            <line x1="38" y1="71" x2="58" y2="71" stroke="#10b981" stroke-width="2" opacity="0.5"/>
+            <circle cx="78" cy="82" r="18" fill="#0a0f1a" stroke="rgba(16,185,129,0.3)" stroke-width="1.5"/>
+            <path d="M71 82l5 5 10-10" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h1 class="welcome-title">PDF Auto-Copy Viewer</h1>
+          <p class="welcome-desc">Sube un PDF, visualízalo exactamente como luce y selecciona texto para copiarlo automáticamente.</p>
+          <button class="btn-upload-main" id="btnUploadMain">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <polyline points="9,15 12,12 15,15"/>
+            </svg>
+            Seleccionar PDF
+          </button>
+          <div class="welcome-or">o arrastra y suelta aquí</div>
+          <div class="welcome-feats">
+            <div class="feat">🔒 100% local — no se sube a ningún servidor</div>
+            <div class="feat">✅ Auto-copy al seleccionar texto</div>
+            <div class="feat">🎨 Formato visual exacto del PDF preservado</div>
+          </div>
+          
+          <div class="recents-section" id="recentsSection" style="display:none; width:100%; margin-top:24px;">
+            <div class="recents-title">Documentos Recientes</div>
+            <div class="recents-list" id="recentsList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="loading-screen" id="loadingScreen" style="display:none">
+        <div class="spinner"></div>
+        <div class="loading-text">Procesando PDF...</div>
+        <div class="loading-sub" id="loadingProgress">Preparando páginas</div>
+      </div>
+
+      <div class="eraser-ui" id="eraserUI">
+        <span>Modo Borrador:</span>
+        <button class="eraser-btn" data-mode="paragraph">¶ Párrafo</button>
+        <button class="eraser-btn" data-mode="line">▬ Línea</button>
+        <button class="eraser-btn active" data-mode="word">◾ Palabra</button>
+      </div>
+
+      <div class="pdf-container" id="pdfContainer" style="display:none">
+        <div class="pages-wrapper" id="pagesWrapper"></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="copy-toast" id="copyToast">
+    <svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+    <span id="toastText">Copiado</span>
+  </div>
+
+  <script src="pdf-viewer.js"></script>
+</body>
+</html>

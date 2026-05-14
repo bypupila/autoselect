@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoSelect Pro</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="popup-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"/>
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">AutoSelect <span class="brand-pro">Pro</span></span>
+          <span class="brand-tagline">Auto-copy on selection</span>
+        </div>
+      </div>
+
+      <!-- Main Toggle -->
+      <div class="toggle-wrapper" id="toggleWrapper">
+        <span class="toggle-label" id="toggleLabel">ON</span>
+        <label class="toggle" for="mainToggle">
+          <input type="checkbox" id="mainToggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </header>
+
+    <!-- Status Banner -->
+    <div class="status-banner" id="statusBanner">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Activo — selecciona cualquier texto para copiar</span>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Plan</div>
+      <div class="quick-settings">
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name" id="planName">Free</div>
+            <div class="setting-desc" id="planMeta">50 copias automáticas por día</div>
+          </div>
+          <div id="planBadge" class="btn-pdf-badge" style="position:static">FREE</div>
+        </div>
+        <div class="plan-actions" id="planActions">
+          <button class="plan-action-btn trial" id="btnStartTrial">Probar 3 días</button>
+          <button class="plan-action-btn activate" id="btnActivatePro">Activar Pro</button>
+          <button class="plan-action-btn manage" id="btnManageLicense" style="display:none">Gestionar licencia</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="copyCount">0</div>
+        <div class="stat-label">Copiados hoy</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-card">
+        <div class="stat-value" id="sessionCount">0</div>
+        <div class="stat-label">Esta sesión</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-card">
+        <div class="stat-indicator" id="colorIndicator"></div>
+        <div class="stat-label">Color activo</div>
+      </div>
+    </div>
+
+    <!-- Quick Settings -->
+    <div class="section">
+      <div class="section-title">Configuración rápida</div>
+
+      <div class="quick-settings">
+        <!-- Highlight Color -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Color de selección</div>
+            <div class="setting-desc">Highlight al copiar</div>
+          </div>
+          <div class="color-picker-wrapper">
+            <div class="color-preview" id="colorPreview"></div>
+            <input type="color" id="quickColor" class="color-input">
+          </div>
+        </div>
+
+        <!-- Checkmark Position -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Indicador ✓</div>
+            <div class="setting-desc">Dónde aparece</div>
+          </div>
+          <select id="quickPosition" class="mini-select">
+            <option value="cursor">Cursor</option>
+            <option value="corner">Esquina</option>
+            <option value="both">Ambos</option>
+            <option value="none">Ninguno</option>
+          </select>
+        </div>
+
+        <!-- Sound Toggle -->
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Sonido</div>
+            <div class="setting-desc">Tono al copiar</div>
+          </div>
+          <label class="mini-toggle" for="soundToggle">
+            <input type="checkbox" id="soundToggle">
+            <span class="mini-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Last Copied Preview -->
+    <div class="last-copied" id="lastCopied" style="display:none">
+      <div class="last-copied-label">Último copiado</div>
+      <div class="last-copied-text" id="lastCopiedText"></div>
+    </div>
+
+    <!-- PDF Viewer Button -->
+    <button class="btn-pdf-viewer" id="btnPdfViewer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10,9 9,9 8,9"/>
+      </svg>
+      Abrir PDF Viewer
+      <span class="btn-pdf-badge">NUEVO</span>
+    </button>
+
+    <!-- Footer -->
+    <footer class="popup-footer">
+      <button class="btn-options" id="btnOptions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/>
+        </svg>
+        Opciones avanzadas
+      </button>
+      <div class="version">v1.1.0</div>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

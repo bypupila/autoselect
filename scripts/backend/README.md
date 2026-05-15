@@ -21,6 +21,9 @@ POLAR_EARLY_BIRD_BENEFIT_ID=
 POLAR_LIFETIME_BENEFIT_ID=
 POLAR_ANNUAL_BENEFIT_ID=
 ALLOWED_EXTENSION_ORIGINS=
+PUBLIC_BASE_URL=https://autoselect.bypupila.com
+PRIVACY_URL=
+TERMS_URL=
 CHECKOUT_EARLY_BIRD_URL=
 CHECKOUT_LIFETIME_URL=
 CHECKOUT_ANNUAL_URL=
@@ -32,7 +35,7 @@ PROMO_COUPON_CODE=
 PROMO_COUPON_PLAN=lifetime
 ```
 
-`PROMO_COUPON_ENABLED` should stay `false` in production unless you are running a short, controlled test. `EARLY_BIRD_ENDS_AT` is a global UTC deadline for the launch offer. Polar license validation requires a License Keys benefit on each paid product and the matching benefit IDs above.
+`PROMO_COUPON_ENABLED` should stay `false` in production unless you are running a short, controlled test. `EARLY_BIRD_ENDS_AT` is a global UTC deadline for the launch offer. `PUBLIC_BASE_URL` controls the public legal URLs served at `/privacy` and `/terms`; override `PRIVACY_URL` or `TERMS_URL` only if those pages move elsewhere. The backend normalizes Postgres URLs to `sslmode=verify-full` at runtime for stricter TLS behavior. Polar license validation requires a License Keys benefit on each paid product and the matching benefit IDs above.
 
 ## 3) Database schema
 
@@ -56,5 +59,7 @@ curl http://localhost:8787/health
 - `GET /api/checkout-links`
 - `POST /api/lead-upsert`
 - `POST /api/event`
+- `GET /privacy`
+- `GET /terms`
 
-The extension does not ship with a localhost backend URL for Chrome Web Store builds. Configure the production HTTPS API URL and Polar checkout links in Options > Licencia > Configuración avanzada before packaging.
+The extension ships with `https://autoselect.bypupila.com` as the production backend URL. Before packaging, open Options > Licencia > Configuración avanzada and confirm the API URL, checkout links, privacy URL, and terms URL match production.

@@ -40,9 +40,9 @@ const DEFAULT_BILLING = {
 };
 
 const DEFAULT_APP_CONFIG = {
-  apiBaseUrl: "https://autoselect-production.up.railway.app",
-  privacyUrl: "",
-  termsUrl: "",
+  apiBaseUrl: "https://autoselect.bypupila.com",
+  privacyUrl: "https://autoselect.bypupila.com/privacy",
+  termsUrl: "https://autoselect.bypupila.com/terms",
   earlyBirdEndsAt: "2026-06-15T03:00:00.000Z",
   checkoutLinks: {
     earlyBird: "",
@@ -304,6 +304,8 @@ async function hydrateCheckoutLinks(appConfig) {
     const merged = {
       ...appConfig,
       earlyBirdEndsAt: data.early_bird_ends_at || appConfig.earlyBirdEndsAt,
+      privacyUrl: data.privacy_url || appConfig.privacyUrl,
+      termsUrl: data.terms_url || appConfig.termsUrl,
       checkoutLinks: {
         earlyBird: data.links.earlyBird || appConfig.checkoutLinks?.earlyBird || "",
         lifetime: data.links.lifetime || appConfig.checkoutLinks?.lifetime || "",

@@ -31,6 +31,12 @@ const CHECKOUT_ANNUAL_PRICE_ID =
   process.env.CHECKOUT_ANNUAL_PRICE_ID || "7aca868a-107f-4411-b41d-4372ebc83547";
 const EARLY_BIRD_ENDS_AT =
   process.env.EARLY_BIRD_ENDS_AT || "2026-06-15T03:00:00.000Z";
+const PUBLIC_BASE_URL =
+  safeHttpsUrlFromEnv(process.env.PUBLIC_BASE_URL) || "https://autoselect.bypupila.com";
+const PRIVACY_URL =
+  safeHttpsUrlFromEnv(process.env.PRIVACY_URL) || `${PUBLIC_BASE_URL}/privacy`;
+const TERMS_URL =
+  safeHttpsUrlFromEnv(process.env.TERMS_URL) || `${PUBLIC_BASE_URL}/terms`;
 
 if (!DATABASE_URL) throw new Error("Missing DATABASE_URL");
 if (!POLAR_ACCESS_TOKEN) throw new Error("Missing POLAR_ACCESS_TOKEN");
@@ -52,7 +58,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const pool = new Pool({ connectionString: DATABASE_URL });
+const pool = new Pool({ connectionString: normalizeDatabaseUrl(DATABASE_URL) });
 
 const POLAR_API_BASE =
   POLAR_SERVER === "sandbox"
@@ -93,6 +99,29 @@ function rateLimit(name, limit, windowMs) {
   };
 }
 
+function safeHttpsUrlFromEnv(value) {
+  if (!value) return "";
+  try {
+    const url = new URL(String(value).trim());
+    return url.protocol === "https:" ? url.toString().replace(/\/$/, "") : "";
+  } catch {
+    return "";
+  }
+}
+
+function normalizeDatabaseUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol === "postgres:" || url.protocol === "postgresql:") {
+      url.searchParams.set("sslmode", "verify-full");
+      return url.toString();
+    }
+  } catch {
+    // Let pg surface the original connection error.
+  }
+  return value;
+}
+
 function isValidEmail(value) {
   return typeof value === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
@@ -115,10 +144,213 @@ function asyncHandler(fn) {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 
+function legalPage({ title, summary, sections }) {
+  const sectionHtml = sections
+    .map(
+      (section) => `
+        <section>
+          <h2>${section.title}</h2>
+          ${section.body
+            .map((paragraph) => `<p>${paragraph}</p>`)
+            .join("")}
+        </section>
+      `,
+    )
+    .join("");
+
+  return `<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title} | AutoSelect Pro</title>
+  <meta name="description" content="${summary}">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111f;
+      --panel: #0f1b2e;
+      --text: #edf5ff;
+      --muted: #9fb0c7;
+      --line: #22314a;
+      --accent: #10b981;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    main {
+      width: min(920px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 64px;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+    }
+    .brand {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(32px, 6vw, 54px);
+      line-height: 1.05;
+      margin: 12px 0 16px;
+      letter-spacing: 0;
+    }
+    h2 {
+      font-size: 20px;
+      margin: 30px 0 8px;
+      letter-spacing: 0;
+    }
+    p, li { color: var(--muted); font-size: 16px; }
+    a { color: var(--accent); }
+    .updated {
+      display: inline-flex;
+      margin-top: 10px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    footer {
+      margin-top: 40px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand">AutoSelect Pro</div>
+      <h1>${title}</h1>
+      <p>${summary}</p>
+      <div class="updated">Ultima actualizacion: 15 de mayo de 2026</div>
+    </header>
+    ${sectionHtml}
+    <footer>
+      Contacto: <a href="mailto:hello@bypupila.com">hello@bypupila.com</a>
+    </footer>
+  </main>
+</body>
+</html>`;
+}
+
 app.get("/health", asyncHandler(async (_req, res) => {
   await pool.query("select 1");
   res.json({ ok: true });
 }));
+
+app.get("/privacy", (_req, res) => {
+  res
+    .type("html")
+    .set("Cache-Control", "public, max-age=3600")
+    .send(
+      legalPage({
+        title: "Politica de privacidad",
+        summary:
+          "Esta politica explica que datos usa AutoSelect Pro para operar licencias, pruebas, marketing opcional y funciones locales de la extension.",
+        sections: [
+          {
+            title: "Responsable y alcance",
+            body: [
+              "AutoSelect Pro / BY PUPILA opera la extension AutoSelect Pro para Chrome y el backend asociado publicado en este dominio. Esta politica aplica a la extension, al sistema de licencias y a las paginas publicas de soporte del producto.",
+            ],
+          },
+          {
+            title: "Datos que procesamos",
+            body: [
+              "Para activar una licencia podemos procesar email, license key, identificador de instalacion, plan activo, estado de validacion, fechas de activacion y eventos tecnicos como intento de activacion, inicio de trial o limite de cuota alcanzado.",
+              "Si aceptas marketing, guardamos tu consentimiento y podemos sincronizar tu email con un proveedor de email marketing. El consentimiento es opcional y no es necesario para usar una licencia comprada.",
+            ],
+          },
+          {
+            title: "Datos locales de la extension",
+            body: [
+              "El contenido copiado, los textos de PDFs, los archivos PDF locales, preferencias de highlight, blacklist y documentos recientes se procesan en tu navegador. AutoSelect Pro no sube tus PDFs ni el contenido del portapapeles al servidor para ejecutar las funciones principales.",
+              "La version gratuita registra localmente el conteo diario de copias automaticas para aplicar el limite del plan. La version Pro elimina ese limite.",
+            ],
+          },
+          {
+            title: "Proveedores",
+            body: [
+              "Usamos Polar para checkout y licencias, Neon Postgres para guardar datos operativos, Railway para hospedar el backend y, solo con consentimiento, Brevo u otro proveedor equivalente para email marketing.",
+            ],
+          },
+          {
+            title: "Seguridad y conservacion",
+            body: [
+              "Las comunicaciones con el backend usan HTTPS. Las claves de licencia se validan contra Polar y se almacenan en el navegador para permitir revalidaciones. Conservamos datos operativos mientras sean necesarios para soporte, seguridad, analitica basica del producto y cumplimiento de obligaciones comerciales.",
+            ],
+          },
+          {
+            title: "Tus derechos",
+            body: [
+              "Puedes solicitar acceso, correccion o eliminacion de tus datos escribiendo a hello@bypupila.com. Tambien puedes retirar el consentimiento de marketing desde los emails recibidos o solicitandolo por contacto.",
+            ],
+          },
+        ],
+      }),
+    );
+});
+
+app.get("/terms", (_req, res) => {
+  res
+    .type("html")
+    .set("Cache-Control", "public, max-age=3600")
+    .send(
+      legalPage({
+        title: "Terminos de uso",
+        summary:
+          "Estos terminos regulan el uso de AutoSelect Pro, sus funciones gratuitas, planes Pro, trials, compras y licencias.",
+        sections: [
+          {
+            title: "Uso del producto",
+            body: [
+              "AutoSelect Pro es una herramienta de productividad para copiar texto seleccionado en paginas web y trabajar con PDFs locales desde el navegador. Debes usarla de forma legal y respetando los derechos sobre el contenido que procesas.",
+            ],
+          },
+          {
+            title: "Plan gratuito y plan Pro",
+            body: [
+              "La version gratuita puede incluir limites funcionales, como cuota diaria de copias automaticas y acceso reducido a modos avanzados de PDF. AutoSelect Pro desbloquea funciones premium, incluyendo modos inteligentes de extraccion, filtros, seleccion multiple, modo borrador, personalizacion e historial ampliado.",
+            ],
+          },
+          {
+            title: "Compras, trial y licencias",
+            body: [
+              "Las compras se procesan mediante Polar. Despues de comprar, debes usar la license key emitida para activar Pro en la extension. El trial gratuito, cuando este disponible, dura 3 dias y puede usarse una sola vez por instalacion.",
+              "La oferta Early Bird finaliza el 15 de junio de 2026 a las 03:00 UTC. Despues de esa fecha puede dejar de mostrarse y quedar disponible solo la licencia Lifetime regular u otros planes vigentes.",
+            ],
+          },
+          {
+            title: "Reembolsos y soporte",
+            body: [
+              "Los pagos, facturas y reembolsos se gestionan con Polar conforme a sus procesos y politicas aplicables. Para soporte de activacion o problemas tecnicos puedes escribir a hello@bypupila.com.",
+            ],
+          },
+          {
+            title: "Disponibilidad y cambios",
+            body: [
+              "AutoSelect Pro se ofrece tal como esta disponible. Podemos corregir errores, cambiar funciones, ajustar precios futuros o retirar promociones sin afectar derechos ya adquiridos por compras completadas.",
+            ],
+          },
+        ],
+      }),
+    );
+});
 
 app.get("/api/checkout-links", rateLimit("checkout-links", 60, 60 * 1000), asyncHandler(async (_req, res) => {
   const configured = {
@@ -143,6 +375,8 @@ app.get("/api/checkout-links", rateLimit("checkout-links", 60, 60 * 1000), async
     ok: true,
     links,
     early_bird_ends_at: EARLY_BIRD_ENDS_AT,
+    privacy_url: PRIVACY_URL,
+    terms_url: TERMS_URL,
   });
 }));
 

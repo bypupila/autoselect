@@ -1,7 +1,10 @@
 import express from "express";
 import pg from "pg";
+import { readFileSync } from "node:fs";
 
 const { Pool } = pg;
+
+loadLocalEnv();
 
 const PORT = Number(process.env.PORT || 8787);
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -80,6 +83,21 @@ const PLAN_CODE_BY_BENEFIT = Object.fromEntries(
 );
 
 const RATE_LIMITS = new Map();
+
+function loadLocalEnv() {
+  try {
+    const env = readFileSync(new URL(".env", import.meta.url), "utf8");
+    for (const line of env.split(/\r?\n/)) {
+      const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)?\s*$/);
+      if (!match) continue;
+      const [, key, rawValue = ""] = match;
+      if (Object.prototype.hasOwnProperty.call(process.env, key)) continue;
+      process.env[key] = rawValue.replace(/^(['"])(.*)\1$/, "$2");
+    }
+  } catch {
+    // Production hosts provide real environment variables; local .env is optional.
+  }
+}
 
 function rateLimit(name, limit, windowMs) {
   return (req, res, next) => {

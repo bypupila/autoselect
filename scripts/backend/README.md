@@ -35,7 +35,7 @@ PROMO_COUPON_CODE=
 PROMO_COUPON_PLAN=lifetime
 ```
 
-`PROMO_COUPON_ENABLED` should stay `false` in production unless you are running a short, controlled test. `EARLY_BIRD_ENDS_AT` is a global UTC deadline for the launch offer. `PUBLIC_BASE_URL` controls the public legal URLs served at `/privacy` and `/terms`; override `PRIVACY_URL` or `TERMS_URL` only if those pages move elsewhere. The backend normalizes Postgres URLs to `sslmode=verify-full` at runtime for stricter TLS behavior. Polar license validation requires a License Keys benefit on each paid product and the matching benefit IDs above.
+`PROMO_COUPON_ENABLED` should stay `false` in production unless you are running a short, controlled test. For the lifetime promo code `Think2026`, set `PROMO_COUPON_ENABLED=true`, `PROMO_COUPON_CODE=Think2026`, and `PROMO_COUPON_PLAN=lifetime`. `EARLY_BIRD_ENDS_AT` is a global UTC deadline for the launch offer. `PUBLIC_BASE_URL` controls the public legal URLs served at `/privacy` and `/terms`; override `PRIVACY_URL` or `TERMS_URL` only if those pages move elsewhere. The backend normalizes Postgres URLs to `sslmode=verify-full` at runtime for stricter TLS behavior. Polar license validation requires a License Keys benefit on each paid product and the matching benefit IDs above.
 
 ## 3) Database schema
 

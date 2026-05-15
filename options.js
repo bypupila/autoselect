@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS = {
 let settings = { ...DEFAULT_SETTINGS };
 let saveTimeout = null;
 let runtime = null;
+let earlyBirdTimer = null;
 
 // ─── DOM ─────────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -64,6 +65,7 @@ const els = {
   btnBuyEarlyBird:   $('btnBuyEarlyBird'),
   btnBuyLifetime:    $('btnBuyLifetime'),
   btnBuyAnnual:      $('btnBuyAnnual'),
+  earlyBirdCountdown:$('earlyBirdCountdown'),
   btnActivateLicense:$('btnActivateLicense'),
   btnActivateCoupon: $('btnActivateCoupon'),
   btnStartTrial:     $('btnStartTrial'),
@@ -195,15 +197,66 @@ function updateLicenseUI() {
 
 function updatePurchaseButtons() {
   const links = runtime?.appConfig?.checkoutLinks || {};
+  const earlyBirdEndsAt = runtime?.appConfig?.earlyBirdEndsAt || null;
+  const earlyBirdExpired = isEarlyBirdExpired(earlyBirdEndsAt);
+
+  if (earlyBirdExpired) {
+    if (els.btnBuyEarlyBird) els.btnBuyEarlyBird.style.display = 'none';
+    if (els.btnBuyAnnual) els.btnBuyAnnual.style.display = 'none';
+    if (els.btnBuyLifetime) els.btnBuyLifetime.style.display = '';
+    document.querySelector('.purchase-grid')?.classList.add('only-lifetime');
+  } else {
+    if (els.btnBuyEarlyBird) els.btnBuyEarlyBird.style.display = '';
+    if (els.btnBuyAnnual) els.btnBuyAnnual.style.display = '';
+    document.querySelector('.purchase-grid')?.classList.remove('only-lifetime');
+  }
+
   [
-    [els.btnBuyEarlyBird, links.earlyBird],
+    [els.btnBuyEarlyBird, links.earlyBird, earlyBirdExpired],
     [els.btnBuyLifetime, links.lifetime],
     [els.btnBuyAnnual, links.annual]
-  ].forEach(([btn, url]) => {
+  ].forEach(([btn, url, forceDisabled]) => {
     if (!btn) return;
-    btn.disabled = !isHttpsUrl(url);
+    btn.disabled = !!forceDisabled || !isHttpsUrl(url);
     btn.title = btn.disabled ? 'Configura este checkout de Polar en Configuración avanzada.' : 'Abrir checkout seguro de Polar';
   });
+
+  updateEarlyBirdCountdown(earlyBirdEndsAt);
+}
+
+function isEarlyBirdExpired(endsAtIso) {
+  if (!endsAtIso) return false;
+  const endsAt = new Date(endsAtIso);
+  if (Number.isNaN(endsAt.getTime())) return false;
+  return endsAt.getTime() <= Date.now();
+}
+
+function updateEarlyBirdCountdown(endsAtIso) {
+  clearInterval(earlyBirdTimer);
+  if (!els.earlyBirdCountdown) return;
+  if (!endsAtIso || isEarlyBirdExpired(endsAtIso)) {
+    els.earlyBirdCountdown.textContent = 'Oferta finalizada';
+    return;
+  }
+  const tick = () => {
+    const endsAt = new Date(endsAtIso).getTime();
+    const remaining = endsAt - Date.now();
+    if (remaining <= 0) {
+      els.earlyBirdCountdown.textContent = 'Oferta finalizada';
+      clearInterval(earlyBirdTimer);
+      updatePurchaseButtons();
+      return;
+    }
+    const totalSeconds = Math.floor(remaining / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    els.earlyBirdCountdown.textContent =
+      `Termina en ${days}d ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+  };
+  tick();
+  earlyBirdTimer = setInterval(tick, 1000);
 }
 
 function isHttpsUrl(value) {

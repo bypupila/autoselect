@@ -654,6 +654,10 @@ html, body {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.license-grid.purchase-grid.only-lifetime {
+  grid-template-columns: 1fr;
+}
+
 .license-action {
   min-height: 72px;
   border: 1px solid var(--border-strong);
@@ -704,6 +708,15 @@ html, body {
 
 .license-action.purchase {
   min-height: 86px;
+}
+
+.earlybird-countdown {
+  margin-top: 6px;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  color: #ef4444;
+  letter-spacing: 0.2px;
 }
 
 .license-message {

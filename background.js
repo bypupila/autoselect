@@ -43,6 +43,7 @@ const DEFAULT_APP_CONFIG = {
   apiBaseUrl: "https://autoselect-production.up.railway.app",
   privacyUrl: "",
   termsUrl: "",
+  earlyBirdEndsAt: "2026-06-15T03:00:00.000Z",
   checkoutLinks: {
     earlyBird: "",
     lifetime: "",
@@ -302,6 +303,7 @@ async function hydrateCheckoutLinks(appConfig) {
     if (!data?.ok || !data?.links) return appConfig;
     const merged = {
       ...appConfig,
+      earlyBirdEndsAt: data.early_bird_ends_at || appConfig.earlyBirdEndsAt,
       checkoutLinks: {
         earlyBird: data.links.earlyBird || appConfig.checkoutLinks?.earlyBird || "",
         lifetime: data.links.lifetime || appConfig.checkoutLinks?.lifetime || "",

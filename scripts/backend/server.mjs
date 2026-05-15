@@ -29,6 +29,8 @@ const CHECKOUT_LIFETIME_PRICE_ID =
   process.env.CHECKOUT_LIFETIME_PRICE_ID || "d0a9dbb9-a230-430a-9bce-4c71d63bb988";
 const CHECKOUT_ANNUAL_PRICE_ID =
   process.env.CHECKOUT_ANNUAL_PRICE_ID || "7aca868a-107f-4411-b41d-4372ebc83547";
+const EARLY_BIRD_ENDS_AT =
+  process.env.EARLY_BIRD_ENDS_AT || "2026-06-15T03:00:00.000Z";
 
 if (!DATABASE_URL) throw new Error("Missing DATABASE_URL");
 if (!POLAR_ACCESS_TOKEN) throw new Error("Missing POLAR_ACCESS_TOKEN");
@@ -140,6 +142,7 @@ app.get("/api/checkout-links", rateLimit("checkout-links", 60, 60 * 1000), async
   res.json({
     ok: true,
     links,
+    early_bird_ends_at: EARLY_BIRD_ENDS_AT,
   });
 }));
 

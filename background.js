@@ -10,6 +10,8 @@ const DEFAULT_SETTINGS = {
   cooldown: 0,
   soundEnabled: false,
   pdfMode: true,
+  pdfLineGapSplitEnabled: true,
+  pdfLineGapThreshold: 56,
   copyOnSelect: true,
   copyOnDoubleClick: true,
   blacklist: [],

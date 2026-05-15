@@ -10,6 +10,8 @@ const DEFAULT_SETTINGS = {
   cooldown: 0,
   soundEnabled: false,
   pdfMode: true,
+  pdfLineGapSplitEnabled: true,
+  pdfLineGapThreshold: 56,
   blacklist: [],
   copyCount: 0
 };
@@ -31,6 +33,9 @@ const els = {
   copyOnSelect:      $('copyOnSelect'),
   copyOnDoubleClick: $('copyOnDoubleClick'),
   pdfMode:           $('pdfMode'),
+  pdfLineGapSplitEnabled: $('pdfLineGapSplitEnabled'),
+  pdfLineGapThreshold: $('pdfLineGapThreshold'),
+  pdfLineGapThresholdValue: $('pdfLineGapThresholdValue'),
   soundEnabled:      $('soundEnabled'),
   highlightColor:    $('highlightColor'),
   highlightOpacity:  $('highlightOpacity'),
@@ -104,6 +109,9 @@ function applyToUI() {
   els.copyOnSelect.checked     = settings.copyOnSelect;
   els.copyOnDoubleClick.checked= settings.copyOnDoubleClick;
   els.pdfMode.checked          = settings.pdfMode;
+  els.pdfLineGapSplitEnabled.checked = settings.pdfLineGapSplitEnabled;
+  els.pdfLineGapThreshold.value = settings.pdfLineGapThreshold;
+  els.pdfLineGapThresholdValue.textContent = settings.pdfLineGapThreshold + 'px';
   els.soundEnabled.checked     = settings.soundEnabled;
   els.highlightColor.value     = settings.highlightColor;
   els.highlightOpacity.value   = settings.highlightOpacity;
@@ -342,6 +350,17 @@ function attachListeners() {
 
   els.pdfMode.addEventListener('change', () => {
     settings.pdfMode = els.pdfMode.checked;
+    save();
+  });
+
+  els.pdfLineGapSplitEnabled.addEventListener('change', () => {
+    settings.pdfLineGapSplitEnabled = els.pdfLineGapSplitEnabled.checked;
+    save();
+  });
+
+  els.pdfLineGapThreshold.addEventListener('input', () => {
+    settings.pdfLineGapThreshold = parseInt(els.pdfLineGapThreshold.value, 10);
+    els.pdfLineGapThresholdValue.textContent = settings.pdfLineGapThreshold + 'px';
     save();
   });
 

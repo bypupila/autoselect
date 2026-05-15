@@ -48,7 +48,7 @@ const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use((req, res, next) => {
   const origin = req.get("origin");
-  if (origin && ALLOWED_EXTENSION_ORIGINS.length > 0 && !ALLOWED_EXTENSION_ORIGINS.includes(origin)) {
+  if (origin && ALLOWED_EXTENSION_ORIGINS.length > 0 && !isAllowedOrigin(origin)) {
     return res.status(403).json({ ok: false, reason: "origin_not_allowed" });
   }
   if (origin) {
@@ -96,6 +96,16 @@ function loadLocalEnv() {
     }
   } catch {
     // Production hosts provide real environment variables; local .env is optional.
+  }
+}
+
+function isAllowedOrigin(origin) {
+  if (ALLOWED_EXTENSION_ORIGINS.includes(origin)) return true;
+  if (!ALLOWED_EXTENSION_ORIGINS.includes("chrome-extension://*")) return false;
+  try {
+    return new URL(origin).protocol === "chrome-extension:";
+  } catch {
+    return false;
   }
 }
 

@@ -7,7 +7,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';
 let pdfDoc=null,scale=1.25,curPage=1,total=0,copies=0,lastText='';
 let mode='block'; // block | paragraph | line | word | free
 const filters={onlyNums:false,noNums:false,noSpecial:false};
-let runtime={billingState:{plan:'free'},features:{isPro:false,recentsMax:0,pdfModes:['free']}};
+let runtime={
+  billingState:{plan:'free'},
+  features:{isPro:false,recentsMax:0,pdfModes:['free']},
+  settings:{pdfLineGapSplitEnabled:true,pdfLineGapThreshold:56}
+};
 
 // Multi-select state
 let isShiftDown=false, isCtrlDown=false;
@@ -37,7 +41,14 @@ async function loadRuntime(){
   if(typeof chrome==='undefined'||!chrome.runtime)return;
   const response=await chrome.runtime.sendMessage({type:'GET_RUNTIME_STATE'}).catch(()=>null);
   if(response?.ok&&response.runtime){
-    runtime=response.runtime;
+    runtime={
+      ...response.runtime,
+      settings:{
+        pdfLineGapSplitEnabled:true,
+        pdfLineGapThreshold:56,
+        ...(response.runtime.settings||{})
+      }
+    };
     applyPlanUiLocks();
   }
 }
@@ -238,6 +249,56 @@ function flashOv(ov){
   setTimeout(()=>ov.classList.remove('block-copied'),700);
 }
 
+function getPdfLineGapThreshold(){
+  const value=Number(runtime?.settings?.pdfLineGapThreshold);
+  return Number.isFinite(value)?Math.max(0,value):56;
+}
+
+function splitSpanByWhitespaceGap(span,gapThreshold){
+  if(!runtime?.settings?.pdfLineGapSplitEnabled || !/\s{3,}/.test(span.text)) return [span];
+  const tokens=span.text.match(/\S+|\s+/g)||[];
+  const totalChars=tokens.reduce((sum,t)=>sum+t.length,0)||1;
+  const charW=span.width/totalChars;
+  const pieces=[];
+  let x=span.left;
+  tokens.forEach(token=>{
+    const tokenW=token.length*charW;
+    if(/\S/.test(token)){
+      pieces.push({
+        ...span,
+        text:token,
+        left:x,
+        right:x+tokenW,
+        width:tokenW
+      });
+    }
+    x+=tokenW;
+  });
+  return pieces.length?pieces:[span];
+}
+
+function splitLineByGaps(line){
+  if(!runtime?.settings?.pdfLineGapSplitEnabled) return [line];
+  const gapThreshold=getPdfLineGapThreshold();
+  const parts=line
+    .flatMap(span=>splitSpanByWhitespaceGap(span,gapThreshold))
+    .sort((a,b)=>a.left-b.left);
+  if(!parts.length) return [];
+  const segments=[];let cur=[parts[0]];
+  for(let i=1;i<parts.length;i++){
+    const prev=cur[cur.length-1];
+    const gap=parts[i].left-prev.right;
+    if(gap>gapThreshold){
+      segments.push(cur);
+      cur=[parts[i]];
+    }else{
+      cur.push(parts[i]);
+    }
+  }
+  segments.push(cur);
+  return segments;
+}
+
 // ── Shift Multiselect UI ───────────────────────────────────────────────────
 function updateMultiSelectBadge(){
   let b=$('msBadge');
@@ -343,8 +404,10 @@ function buildOverlays(wrapper,textDiv){
   // LINE
   const layerL=wrapper.querySelector('.ov-layer-line');
   lines.forEach(line=>{
-    const text=line.map(s=>s.text).join(' ').trim();if(!text)return;
-    makeOverlay(layerL,Math.min(...line.map(s=>s.top))-2,Math.min(...line.map(s=>s.left))-4,Math.max(...line.map(s=>s.bottom))+2,Math.max(...line.map(s=>s.right))+4,4,text);
+    splitLineByGaps(line).forEach(segment=>{
+      const text=segment.map(s=>s.text).join(' ').replace(/\s+/g,' ').trim();if(!text)return;
+      makeOverlay(layerL,Math.min(...segment.map(s=>s.top))-2,Math.min(...segment.map(s=>s.left))-4,Math.max(...segment.map(s=>s.bottom))+2,Math.max(...segment.map(s=>s.right))+4,4,text);
+    });
   });
 
   // WORD

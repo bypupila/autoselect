@@ -35,7 +35,28 @@ function activateRecentSelection(overlays){
 
 // ── DOM ────────────────────────────────────────────────────────────────────
 const $=id=>document.getElementById(id);
-const el={fi:$('fileInput'),uz:$('uploadZone'),bum:$('btnUploadMain'),finfo:$('fileInfo'),fn:$('fileName'),fp:$('filePages'),ctrl:$('controls'),bp:$('btnPrev'),bn:$('btnNext'),cp:$('currentPage'),tp:$('totalPages'),gp:$('gotoPage'),bzi:$('btnZoomIn'),bzo:$('btnZoomOut'),zv:$('zoomValue'),ws:$('welcomeScreen'),ls:$('loadingScreen'),lp:$('loadingProgress'),pc:$('pdfContainer'),pw:$('pagesWrapper'),dov:$('dropOverlay'),ct:$('copyToast'),tt:$('toastText'),sc:$('statCopied')};
+const el={layout:$('appLayout'),sidebar:$('viewerSidebar'),bhs:$('btnHideSidebar'),bss:$('btnShowSidebar'),fi:$('fileInput'),uz:$('uploadZone'),bum:$('btnUploadMain'),finfo:$('fileInfo'),fn:$('fileName'),fp:$('filePages'),ctrl:$('controls'),bp:$('btnPrev'),bn:$('btnNext'),cp:$('currentPage'),tp:$('totalPages'),gp:$('gotoPage'),bzi:$('btnZoomIn'),bzo:$('btnZoomOut'),zv:$('zoomValue'),ws:$('welcomeScreen'),ls:$('loadingScreen'),lp:$('loadingProgress'),pc:$('pdfContainer'),pw:$('pagesWrapper'),dov:$('dropOverlay'),ct:$('copyToast'),tt:$('toastText'),sc:$('statCopied')};
+const SIDEBAR_STORAGE_KEY='aspPdfSidebarHidden';
+
+function setSidebarHidden(hidden, persist=true){
+  el.layout?.classList.toggle('sidebar-hidden',hidden);
+  if(el.sidebar){
+    el.sidebar.setAttribute('aria-hidden',hidden?'true':'false');
+    el.sidebar.inert=hidden;
+  }
+  el.bhs?.setAttribute('aria-expanded',hidden?'false':'true');
+  el.bss?.setAttribute('aria-expanded',hidden?'false':'true');
+  el.bss?.setAttribute('tabindex',hidden?'0':'-1');
+  if(persist){
+    try{localStorage.setItem(SIDEBAR_STORAGE_KEY,hidden?'1':'0');}catch{}
+  }
+}
+
+function restoreSidebarState(){
+  let hidden=false;
+  try{hidden=localStorage.getItem(SIDEBAR_STORAGE_KEY)==='1';}catch{}
+  setSidebarHidden(hidden,false);
+}
 
 async function loadRuntime(){
   if(typeof chrome==='undefined'||!chrome.runtime)return;
@@ -557,6 +578,8 @@ function setupManual(){
 
 // ── Events ─────────────────────────────────────────────────────────────────
 function bindEvents(){
+  el.bhs?.addEventListener('click',()=>setSidebarHidden(true));
+  el.bss?.addEventListener('click',()=>setSidebarHidden(false));
   el.fi.addEventListener('change',e=>{if(e.target.files[0])loadPDF(e.target.files[0]);});
   el.uz.addEventListener('click',()=>el.fi.click());
   el.bum.addEventListener('click',()=>el.fi.click());
@@ -672,6 +695,7 @@ function showScreen(w){el.ws.style.display=w==='welcome'?'flex':'none';el.ls.sty
 
 (async()=>{
   await loadRuntime();
+  restoreSidebarState();
   bindEvents();
   setupManual();
   renderRecentList();

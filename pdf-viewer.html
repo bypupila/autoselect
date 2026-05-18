@@ -19,8 +19,8 @@
     </div>
   </div>
 
-  <div class="app-layout">
-    <aside class="sidebar">
+  <div class="app-layout" id="appLayout">
+    <aside class="sidebar" id="viewerSidebar">
       <div class="sidebar-brand">
         <div class="brand-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -31,6 +31,11 @@
           <div class="brand-name">AutoSelect <span>Pro</span></div>
           <div class="brand-sub">PDF Viewer</div>
         </div>
+        <button class="sidebar-toggle" id="btnHideSidebar" type="button" title="Ocultar barra lateral" aria-label="Ocultar barra lateral">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
       </div>
 
       <input type="file" id="fileInput" accept=".pdf" style="display:none">
@@ -119,6 +124,12 @@
     </aside>
 
     <main class="viewer-main" id="viewerMain">
+      <button class="sidebar-restore" id="btnShowSidebar" type="button" title="Mostrar barra lateral" aria-label="Mostrar barra lateral" tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+
       <div class="welcome-screen" id="welcomeScreen">
         <div class="welcome-content">
           <svg viewBox="0 0 120 120" fill="none" width="140" height="140">

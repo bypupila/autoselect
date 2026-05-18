@@ -41,9 +41,19 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Sego
   border-right: 1px solid var(--border);
   display: flex; flex-direction: column;
   padding: 20px 16px; gap: 4px; overflow-y: auto;
+  transition: width 0.2s ease, padding 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.sidebar-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.app-layout.sidebar-hidden .sidebar {
+  width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  border-right-color: transparent;
+  overflow: hidden;
+  transform: translateX(-8px);
+}
+
+.sidebar-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; min-width: 198px; }
 .brand-icon {
   width: 36px; height: 36px; border-radius: 10px;
   background: linear-gradient(135deg, #10b981, #059669);
@@ -53,6 +63,25 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Sego
 .brand-name { font-size: 14px; font-weight: 700; color: var(--text); }
 .brand-name span { color: var(--accent); }
 .brand-sub { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+
+.sidebar-toggle,
+.sidebar-restore {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--bg-elevated); border: 1px solid var(--border-2);
+  color: var(--text-2); font-family: inherit;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+}
+.sidebar-toggle { margin-left: auto; flex-shrink: 0; }
+.sidebar-toggle:hover,
+.sidebar-restore:hover { background: var(--accent-dim); border-color: var(--accent-border); color: var(--accent); }
+.sidebar-restore {
+  position: sticky; top: 16px; left: 16px; z-index: 40;
+  margin: 16px 0 -48px 16px;
+  opacity: 0; pointer-events: none; transform: translateX(-8px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+.app-layout.sidebar-hidden .sidebar-restore { opacity: 1; pointer-events: auto; transform: translateX(0); }
 
 /* Upload zone */
 .upload-zone {
@@ -138,7 +167,7 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Sego
 .stat-lbl { font-size: 11px; color: var(--text-3); }
 
 /* ── Viewer Main ───────────────────────────────────────── */
-.viewer-main { flex: 1; overflow-y: auto; background: #1a1a2e; position: relative; }
+.viewer-main { flex: 1; min-width: 0; overflow-y: auto; background: #1a1a2e; position: relative; }
 
 /* Welcome */
 .welcome-screen { display: flex; align-items: center; justify-content: center; min-height: 100%; padding: 40px 20px; }

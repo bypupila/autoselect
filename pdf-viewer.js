@@ -1,6 +1,6 @@
 // AutoSelect Pro — PDF Viewer v6
 (function(){'use strict';
-if(!window.pdfjsLib){document.body.textContent='Descarga pdf.min.js en la carpeta';return;}
+if(!window.pdfjsLib){document.body.textContent='Missing pdf.min.js in extension folder';return;}
 pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';
 
 // ── State ──────────────────────────────────────────────────────────────────
@@ -10,8 +10,154 @@ const filters={onlyNums:false,noNums:false,noSpecial:false};
 let runtime={
   billingState:{plan:'free'},
   features:{isPro:false,recentsMax:0,pdfModes:['free']},
-  settings:{pdfLineGapSplitEnabled:true,pdfLineGapThreshold:56}
+  settings:{pdfLineGapSplitEnabled:true,pdfLineGapThreshold:56,uiLanguage:'en'}
 };
+let locale='en';
+
+const I18N={
+  en:{
+    title:'AutoSelect Pro — PDF Viewer',
+    brandSub:'PDF Viewer',
+    hideSidebar:'Hide sidebar',
+    showSidebar:'Show sidebar',
+    dropOverlayText:'Drop PDF here',
+    uploadText:'Upload PDF',
+    uploadHint:'or drag here',
+    navSectionLabel:'Navigation',
+    gotoPageLabel:'Go to page',
+    zoomSectionLabel:'Zoom',
+    copyTipLine1:'Hover = highlight block',
+    copyTipLine2:'Click = copy instantly',
+    modeSectionLabel:'Selection Mode',
+    modeLabelBlock:'Block',
+    modeLabelParagraph:'Paragraph',
+    modeLabelLine:'Line',
+    modeLabelWord:'Word',
+    modeLabelFree:'Free',
+    modeTitleBlock:'Text block',
+    modeTitleParagraph:'Paragraph (same format)',
+    modeTitleLine:'Text line',
+    modeTitleWord:'Individual word',
+    modeTitleFree:'Free mouse selection',
+    filtersSectionLabel:'Extraction Filters',
+    filterOnlyNums:'Numbers Only',
+    filterNoNums:'No Numbers',
+    filterNoSpecial:'No Symbols',
+    filterTitleOnlyNums:'Extract numbers only',
+    filterTitleNoNums:'Ignore all numbers',
+    filterTitleNoSpecial:'Only letters and numbers (no symbols)',
+    copiedStatLabel:'copied texts',
+    welcomeTitle:'PDF Auto-Copy Viewer',
+    welcomeDesc:'Upload a PDF, view it exactly as rendered, and select text to auto-copy.',
+    btnUploadMainLabel:'Select PDF',
+    welcomeOrText:'or drag and drop here',
+    welcomeFeatLocal:'🔒 100% local — never uploaded to any server',
+    welcomeFeatAutoCopy:'✅ Auto-copy on text selection',
+    welcomeFeatVisual:'🎨 Exact PDF visual formatting preserved',
+    recentsTitle:'Recent Documents',
+    loadingMainText:'Processing PDF...',
+    loadingProgressPreparing:'Preparing pages',
+    eraserModeLabel:'Eraser Mode:',
+    eraserParagraphLabel:'Paragraph',
+    eraserLineLabel:'Line',
+    eraserWordLabel:'Word',
+    toastCopied:'Copied',
+    toastEdited:'Edited: \"{{text}}\"',
+    toastEmptySelection:'Empty selection',
+    freeLimitReached:'Free limit reached. Upgrade to Pro for unlimited copies.',
+    proFeatureLocked:'Pro feature is locked on Free plan.',
+    tipShiftAdd:'SHIFT + CLICK = ADD',
+    tipClickCopy:'CLICK = COPY',
+    multiSelected:'{{count}} selected. Release SHIFT to copy all.',
+    proAvailable:'Available in Pro',
+    renderProgress:'Rendering {{current}} of {{total}}...',
+    pageLabel:'Page {{page}}',
+    openedOn:'Opened on {{date}}',
+    removeFromHistory:'Remove from history',
+    loadingReading:'Reading...',
+    filePages:'{{count}} page{{suffix}}',
+    scannedPdf:'Scanned PDF',
+    scannedPdfNoText:'No real selectable text.',
+    close:'Close'
+  },
+  es:{
+    title:'AutoSelect Pro — Visor PDF',
+    brandSub:'Visor PDF',
+    hideSidebar:'Ocultar barra lateral',
+    showSidebar:'Mostrar barra lateral',
+    dropOverlayText:'Suelta el PDF aquí',
+    uploadText:'Subir PDF',
+    uploadHint:'o arrastra aquí',
+    navSectionLabel:'Navegación',
+    gotoPageLabel:'Ir a página',
+    zoomSectionLabel:'Zoom',
+    copyTipLine1:'Hover = resalta bloque',
+    copyTipLine2:'Click = copia al instante',
+    modeSectionLabel:'Modo de Selección',
+    modeLabelBlock:'Bloque',
+    modeLabelParagraph:'Párrafo',
+    modeLabelLine:'Línea',
+    modeLabelWord:'Palabra',
+    modeLabelFree:'Libre',
+    modeTitleBlock:'Bloque de texto',
+    modeTitleParagraph:'Párrafo (mismo formato)',
+    modeTitleLine:'Línea de texto',
+    modeTitleWord:'Palabra individual',
+    modeTitleFree:'Selección libre con mouse',
+    filtersSectionLabel:'Filtros de Extracción',
+    filterOnlyNums:'Solo Números',
+    filterNoNums:'Sin Números',
+    filterNoSpecial:'Sin Símbolos',
+    filterTitleOnlyNums:'Extraer únicamente números',
+    filterTitleNoNums:'Ignorar todos los números',
+    filterTitleNoSpecial:'Solo letras y números (sin símbolos)',
+    copiedStatLabel:'textos copiados',
+    welcomeTitle:'PDF Auto-Copy Viewer',
+    welcomeDesc:'Sube un PDF, visualízalo exactamente como luce y selecciona texto para copiarlo automáticamente.',
+    btnUploadMainLabel:'Seleccionar PDF',
+    welcomeOrText:'o arrastra y suelta aquí',
+    welcomeFeatLocal:'🔒 100% local — no se sube a ningún servidor',
+    welcomeFeatAutoCopy:'✅ Auto-copy al seleccionar texto',
+    welcomeFeatVisual:'🎨 Formato visual exacto del PDF preservado',
+    recentsTitle:'Documentos Recientes',
+    loadingMainText:'Procesando PDF...',
+    loadingProgressPreparing:'Preparando páginas',
+    eraserModeLabel:'Modo Borrador:',
+    eraserParagraphLabel:'Párrafo',
+    eraserLineLabel:'Línea',
+    eraserWordLabel:'Palabra',
+    toastCopied:'Copiado',
+    toastEdited:'Editado: \"{{text}}\"',
+    toastEmptySelection:'Selección vacía',
+    freeLimitReached:'Límite Free alcanzado. Activa Pro para copias ilimitadas.',
+    proFeatureLocked:'Función Pro bloqueada en Free.',
+    tipShiftAdd:'SHIFT + CLICK = AÑADIR',
+    tipClickCopy:'CLICK = COPIAR',
+    multiSelected:'{{count}} seleccionados. Suelta SHIFT para copiar todo.',
+    proAvailable:'Disponible en Pro',
+    renderProgress:'Renderizando {{current}} de {{total}}…',
+    pageLabel:'Página {{page}}',
+    openedOn:'Abierto el {{date}}',
+    removeFromHistory:'Eliminar del historial',
+    loadingReading:'Leyendo…',
+    filePages:'{{count}} página{{suffix}}',
+    scannedPdf:'PDF escaneado',
+    scannedPdfNoText:'Sin texto real seleccionable.',
+    close:'Cerrar'
+  }
+};
+
+function t(key,vars={}){
+  const dict=I18N[locale]||I18N.en;
+  const base=dict[key]??I18N.en[key]??key;
+  return Object.entries(vars).reduce((acc,[name,val])=>acc.replaceAll(`{{${name}}}`,String(val)),base);
+}
+
+function setTxt(id,key,vars={}){
+  const node=document.getElementById(id);
+  if(!node)return;
+  node.textContent=t(key,vars);
+}
 
 // Multi-select state
 let isShiftDown=false, isCtrlDown=false;
@@ -37,6 +183,72 @@ function activateRecentSelection(overlays){
 const $=id=>document.getElementById(id);
 const el={layout:$('appLayout'),sidebar:$('viewerSidebar'),bhs:$('btnHideSidebar'),bss:$('btnShowSidebar'),fi:$('fileInput'),uz:$('uploadZone'),bum:$('btnUploadMain'),finfo:$('fileInfo'),fn:$('fileName'),fp:$('filePages'),ctrl:$('controls'),bp:$('btnPrev'),bn:$('btnNext'),cp:$('currentPage'),tp:$('totalPages'),gp:$('gotoPage'),bzi:$('btnZoomIn'),bzo:$('btnZoomOut'),zv:$('zoomValue'),ws:$('welcomeScreen'),ls:$('loadingScreen'),lp:$('loadingProgress'),pc:$('pdfContainer'),pw:$('pagesWrapper'),dov:$('dropOverlay'),ct:$('copyToast'),tt:$('toastText'),sc:$('statCopied')};
 const SIDEBAR_STORAGE_KEY='aspPdfSidebarHidden';
+
+function applyLocalization(){
+  document.documentElement.lang=locale;
+  document.title=t('title');
+  setTxt('dropOverlayText','dropOverlayText');
+  setTxt('brandSub','brandSub');
+  setTxt('uploadText','uploadText');
+  setTxt('uploadHint','uploadHint');
+  setTxt('navSectionLabel','navSectionLabel');
+  setTxt('gotoPageLabel','gotoPageLabel');
+  setTxt('zoomSectionLabel','zoomSectionLabel');
+  setTxt('copyTipLine1','copyTipLine1');
+  setTxt('copyTipLine2','copyTipLine2');
+  setTxt('modeSectionLabel','modeSectionLabel');
+  setTxt('modeLabelBlock','modeLabelBlock');
+  setTxt('modeLabelParagraph','modeLabelParagraph');
+  setTxt('modeLabelLine','modeLabelLine');
+  setTxt('modeLabelWord','modeLabelWord');
+  setTxt('modeLabelFree','modeLabelFree');
+  setTxt('filtersSectionLabel','filtersSectionLabel');
+  setTxt('filterOnlyNums','filterOnlyNums');
+  setTxt('filterNoNums','filterNoNums');
+  setTxt('filterNoSpecial','filterNoSpecial');
+  setTxt('copiedStatLabel','copiedStatLabel');
+  setTxt('welcomeTitle','welcomeTitle');
+  setTxt('welcomeDesc','welcomeDesc');
+  setTxt('btnUploadMainLabel','btnUploadMainLabel');
+  setTxt('welcomeOrText','welcomeOrText');
+  setTxt('welcomeFeatLocal','welcomeFeatLocal');
+  setTxt('welcomeFeatAutoCopy','welcomeFeatAutoCopy');
+  setTxt('welcomeFeatVisual','welcomeFeatVisual');
+  setTxt('recentsTitle','recentsTitle');
+  setTxt('loadingMainText','loadingMainText');
+  setTxt('eraserModeLabel','eraserModeLabel');
+  setTxt('eraserParagraphLabel','eraserParagraphLabel');
+  setTxt('eraserLineLabel','eraserLineLabel');
+  setTxt('eraserWordLabel','eraserWordLabel');
+  setTxt('toastText','toastCopied');
+
+  if(el.bhs){el.bhs.title=t('hideSidebar');el.bhs.setAttribute('aria-label',t('hideSidebar'));}
+  if(el.bss){el.bss.title=t('showSidebar');el.bss.setAttribute('aria-label',t('showSidebar'));}
+
+  const modes={
+    block:'modeTitleBlock',
+    paragraph:'modeTitleParagraph',
+    line:'modeTitleLine',
+    word:'modeTitleWord',
+    free:'modeTitleFree'
+  };
+  document.querySelectorAll('#modeSelector .mode-btn').forEach((btn)=>{
+    const key=modes[btn.dataset.mode];
+    if(key)btn.title=t(key);
+  });
+
+  const filtersMap={
+    onlyNums:'filterTitleOnlyNums',
+    noNums:'filterTitleNoNums',
+    noSpecial:'filterTitleNoSpecial'
+  };
+  document.querySelectorAll('.filter-btn').forEach((btn)=>{
+    const key=filtersMap[btn.dataset.filter];
+    if(key)btn.title=t(key);
+  });
+
+  if(!pdfDoc)el.lp.textContent=t('loadingProgressPreparing');
+}
 
 function setSidebarHidden(hidden, persist=true){
   el.layout?.classList.toggle('sidebar-hidden',hidden);
@@ -70,8 +282,23 @@ async function loadRuntime(){
         ...(response.runtime.settings||{})
       }
     };
+    locale=runtime?.settings?.uiLanguage==='es'?'es':'en';
+    applyLocalization();
     applyPlanUiLocks();
   }
+}
+
+function trackPageView(){
+  chrome?.runtime?.sendMessage({
+    type:'TRACK_EVENT',
+    eventType:'page_view',
+    metadata:{
+      context:'pdf_viewer',
+      pageTitle:document.title,
+      pageLocation:location.href,
+      pagePath:location.pathname
+    }
+  }).catch(()=>{});
 }
 
 function applyPlanUiLocks(){
@@ -82,7 +309,7 @@ function applyPlanUiLocks(){
     const allowed=(runtime?.features?.pdfModes||['free']).includes(m);
     btn.disabled=!allowed;
     btn.classList.toggle('active',m===mode);
-    btn.title=allowed?btn.title:'Disponible en Pro';
+    btn.title=allowed?btn.title:t('proAvailable');
   });
   document.querySelectorAll('.filter-btn').forEach(btn=>{
     btn.disabled=!isPro;
@@ -120,7 +347,7 @@ async function copyText(raw, isEdit=false){
   lastText=text; 
   if(!isEdit){ copies++; el.sc.textContent=copies; currentCopiedText=text; }else{ currentCopiedText=text; }
   const prev=text.length>55?text.slice(0,55)+'…':text;
-  el.tt.textContent=isEdit ? `Editado: "${prev}"` : `"${prev}"`;
+  el.tt.textContent=isEdit ? t('toastEdited',{text:prev}) : `"${prev}"`;
   el.ct.classList.add('show');
   clearTimeout(el.ct._t);
   el.ct._t=setTimeout(()=>el.ct.classList.remove('show'),2500);
@@ -138,8 +365,8 @@ async function requestCopyQuota(context){
 
 function showProLocked(reason){
   el.tt.textContent=reason==='daily_limit_reached'
-    ? 'Límite Free alcanzado. Activa Pro para copias ilimitadas.'
-    : 'Función Pro bloqueada en Free.';
+    ? t('freeLimitReached')
+    : t('proFeatureLocked');
   el.ct.classList.add('show');
   clearTimeout(el.ct._t);
   el.ct._t=setTimeout(()=>el.ct.classList.remove('show'),2600);
@@ -157,7 +384,7 @@ function showTip(ov,text,isMulti){
   tipEl=document.createElement('div');
   tipEl.className='block-tooltip';
   const prev=text.length>40?text.slice(0,40)+'…':text;
-  const action=isShiftDown?'SHIFT + CLICK = AÑADIR':'CLICK = COPIAR';
+  const action=isShiftDown?t('tipShiftAdd'):t('tipClickCopy');
   const badgeCls=isShiftDown?'tip-d':'tip-c';
   const row=document.createElement('div');
   row.className='tip-row';
@@ -250,7 +477,7 @@ function makeOverlay(container,top,left,bottom,right,radius,text){
         const joinStr = mode === 'word' ? ' ' : '\n';
         await copyText(multiSelectItems.join(joinStr), true);
       } else {
-        el.tt.textContent = "Selección vacía";
+        el.tt.textContent = t('toastEmptySelection');
         el.ct.classList.add('show');
         setTimeout(()=>el.ct.classList.remove('show'),2500);
       }
@@ -329,7 +556,7 @@ function updateMultiSelectBadge(){
       b.style.cssText='position:fixed;top:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;padding:10px 20px;border-radius:24px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:700;font-size:13px;box-shadow:0 8px 32px rgba(37,99,235,0.4);z-index:9999;';
       document.body.appendChild(b);
     }
-    b.textContent=`${multiSelectItems.length} seleccionados. Suelta SHIFT para copiar todo.`;
+    b.textContent=t('multiSelected',{count:multiSelectItems.length});
   }else{
     if(b)b.remove();
   }
@@ -450,12 +677,12 @@ function buildOverlays(wrapper,textDiv){
 async function renderAll(){
   el.pw.innerHTML='';let hasText=false;
   for(let pn=1;pn<=total;pn++){
-    el.lp.textContent=`Renderizando ${pn} de ${total}…`;
+    el.lp.textContent=t('renderProgress',{current:pn,total});
     const page=await pdfDoc.getPage(pn);const vp=page.getViewport({scale});
     const wrap=document.createElement('div');
     wrap.className='pdf-page-wrapper';wrap.id=`page-${pn}`;
     wrap.style.width=vp.width+'px';wrap.style.height=vp.height+'px';
-    const lbl=document.createElement('div');lbl.className='pdf-page-label';lbl.textContent=`Página ${pn}`;wrap.appendChild(lbl);
+    const lbl=document.createElement('div');lbl.className='pdf-page-label';lbl.textContent=t('pageLabel',{page:pn});wrap.appendChild(lbl);
     const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;wrap.appendChild(cv);
     const td=document.createElement('div');td.className='textLayer';td.style.setProperty('--scale-factor',scale);wrap.appendChild(td);
     el.pw.appendChild(wrap);
@@ -532,9 +759,9 @@ async function renderRecentList(){
       <div class="recent-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg></div>
       <div class="recent-info">
         <div class="recent-name"></div>
-        <div class="recent-meta">${mb} MB • Abierto el ${date}</div>
+        <div class="recent-meta">${mb} MB • ${t('openedOn',{date})}</div>
       </div>
-      <button class="recent-del" title="Eliminar del historial"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+      <button class="recent-del" title="${t('removeFromHistory')}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
     `;
     const nameEl=div.querySelector('.recent-name');
     nameEl.textContent=r.name;
@@ -552,14 +779,14 @@ async function renderRecentList(){
 
 // ── Load ───────────────────────────────────────────────────────────────────
 async function loadPDF(file, fromRecent=false, buffer=null){
-  showScreen('loading');el.lp.textContent='Leyendo…';el.pw.innerHTML='';
+  showScreen('loading');el.lp.textContent=t('loadingReading');el.pw.innerHTML='';
   try{
     const buf = fromRecent ? buffer : await file.arrayBuffer();
     pdfDoc=await pdfjsLib.getDocument({data:buf}).promise;
     if(!fromRecent) { saveRecent(file, buf).then(renderRecentList); }
   }catch(e){el.lp.textContent='⚠️ '+e.message;setTimeout(()=>showScreen('welcome'),3000);return;}
   total=pdfDoc.numPages;
-  el.fn.textContent=file.name;el.fp.textContent=`${total} página${total!==1?'s':''}`;
+  el.fn.textContent=file.name;el.fp.textContent=t('filePages',{count:total,suffix:total!==1?'s':''});
   el.finfo.style.display=el.ctrl.style.display='block';
   el.tp.textContent=total;el.gp.max=total;el.bp.disabled=true;el.bn.disabled=total<=1;
   showScreen('pdf');await renderAll();curPage=1;updatePageUI();
@@ -679,13 +906,13 @@ function showImgBanner(){
   b.id='ib';
   b.style.cssText='position:fixed;bottom:80px;right:20px;z-index:9999;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.5);border-radius:12px;padding:14px 18px;color:#fbbf24;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:13px;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.4)';
   const title=document.createElement('strong');
-  title.textContent='PDF escaneado';
+  title.textContent=t('scannedPdf');
   const detail=document.createElement('span');
   detail.style.cssText='display:block;font-size:12px;opacity:.85;margin-top:2px';
-  detail.textContent='Sin texto real seleccionable.';
+  detail.textContent=t('scannedPdfNoText');
   const close=document.createElement('button');
   close.type='button';
-  close.textContent='Cerrar';
+  close.textContent=t('close');
   close.style.cssText='margin-top:8px;width:100%;background:transparent;border:1px solid rgba(245,158,11,.3);border-radius:6px;color:#fbbf24;font-size:11px;padding:5px;cursor:pointer';
   close.addEventListener('click',()=>b.remove());
   b.append(title,detail,close);
@@ -693,8 +920,11 @@ function showImgBanner(){
 }
 function showScreen(w){el.ws.style.display=w==='welcome'?'flex':'none';el.ls.style.display=w==='loading'?'flex':'none';el.pc.style.display=w==='pdf'?'flex':'none';}
 
+applyLocalization();
+
 (async()=>{
   await loadRuntime();
+  trackPageView();
   restoreSidebarState();
   bindEvents();
   setupManual();

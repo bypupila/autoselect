@@ -4,6 +4,9 @@
 (function () {
   'use strict';
 
+  if (globalThis.__AUTOSELECT_PRO_CONTENT_LOADED__) return;
+  globalThis.__AUTOSELECT_PRO_CONTENT_LOADED__ = true;
+
   // ─── State ───────────────────────────────────────────────────────────────
   let settings = {
     enabled: true,
@@ -14,6 +17,8 @@
     minChars: 1,
     cooldown: 0,
     soundEnabled: false,
+    desktopNotificationsEnabled: true,
+    uiLanguage: 'en',
     copyOnSelect: true,
     copyOnDoubleClick: true,
     blacklist: []
@@ -70,9 +75,12 @@
   }
 
   function listenForSettingsChanges() {
-    chrome.runtime.onMessage.addListener((message) => {
+    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (message.type === 'RUNTIME_CHANGED') {
         runtimeState = { ...runtimeState, ...(message.runtimeState || {}) };
+      }
+      if (message.type === 'PING_CONTENT_SCRIPT') {
+        sendResponse({ ok: true, href: window.location.href });
       }
     });
     chrome.storage.onChanged.addListener((changes, areaName) => {
@@ -89,6 +97,21 @@
     return settings.blacklist.some(domain =>
       host === domain || host.endsWith('.' + domain)
     );
+  }
+
+  function isSpanish() {
+    return settings.uiLanguage === 'es';
+  }
+
+  function t(key) {
+    const messages = {
+      limitReached: isSpanish()
+        ? 'Límite diario gratis alcanzado (50). Activa Pro para copias ilimitadas.'
+        : 'Daily free limit reached (50). Upgrade to Pro for unlimited copies.',
+      copied: isSpanish() ? 'Copiado' : 'Copied',
+      copiedPreview: isSpanish() ? 'Copiado - \"{{preview}}\"' : 'Copied - \"{{preview}}\"'
+    };
+    return messages[key] || key;
   }
 
   // ─── Inject CSS Styles ───────────────────────────────────────────────────
@@ -323,6 +346,11 @@
 
   // ─── On Copy Success ──────────────────────────────────────────────────────
   function onCopySuccess(text, selection) {
+    chrome.runtime.sendMessage({
+      type: 'COPY_SUCCESS',
+      previewText: text.slice(0, 120)
+    }).catch(() => {});
+
     // Play sound if enabled
     if (settings.soundEnabled) playCopySound();
 
@@ -362,7 +390,7 @@
       <div class="asp-checkmark-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
         <svg viewBox="0 0 12 12"><path d="M6 1.5v5.5"/><circle cx="6" cy="9.3" r="0.8" fill="white" stroke="none"/></svg>
       </div>
-      <span>Límite diario gratis alcanzado (50). Activa Pro para copias ilimitadas.</span>
+      <span>${t('limitReached')}</span>
     `;
     document.body.appendChild(toast);
     checkmarkEl = toast;
@@ -386,7 +414,7 @@
       const el = document.createElement('div');
       el.className = 'asp-checkmark';
       el.id = 'asp-checkmark-cursor';
-      el.innerHTML = `${iconHTML}<span>Copiado</span>`;
+      el.innerHTML = `${iconHTML}<span>${t('copied')}</span>`;
       el.style.cssText = `left:${mouseX + 12}px; top:${mouseY - 36}px;`;
 
       // Keep inside viewport
@@ -406,7 +434,7 @@
       el.id = 'asp-checkmark-corner';
       el.innerHTML = iconHTML;
       const label = document.createElement('span');
-      label.textContent = `Copiado - "${preview}"`;
+      label.textContent = t('copiedPreview').replace('{{preview}}', preview);
       el.appendChild(label);
       document.body.appendChild(el);
     }

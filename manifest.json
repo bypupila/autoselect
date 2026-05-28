@@ -7,7 +7,12 @@
 
   "permissions": [
     "clipboardWrite",
-    "storage"
+    "storage",
+    "scripting"
+  ],
+
+  "optional_permissions": [
+    "notifications"
   ],
 
   "host_permissions": [

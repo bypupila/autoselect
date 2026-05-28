@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoSelect Pro — Visor PDF</title>
+  <title>AutoSelect Pro — PDF Viewer</title>
   <script src="pdf.min.js"></script>
   <link rel="stylesheet" href="pdf-viewer.css">
 </head>
@@ -15,7 +15,7 @@
         <path d="M28 4v16h16" stroke="#10b981" stroke-width="2"/>
         <path d="M24 34l8-10 8 10M32 24v20" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <div>Suelta el PDF aquí</div>
+      <div id="dropOverlayText">Drop PDF here</div>
     </div>
   </div>
 
@@ -29,9 +29,9 @@
         </div>
         <div>
           <div class="brand-name">AutoSelect <span>Pro</span></div>
-          <div class="brand-sub">PDF Viewer</div>
+          <div class="brand-sub" id="brandSub">PDF Viewer</div>
         </div>
-        <button class="sidebar-toggle" id="btnHideSidebar" type="button" title="Ocultar barra lateral" aria-label="Ocultar barra lateral">
+        <button class="sidebar-toggle" id="btnHideSidebar" type="button" title="Hide sidebar" aria-label="Hide sidebar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
             <path d="M15 18l-6-6 6-6"/>
           </svg>
@@ -46,8 +46,8 @@
           <line x1="12" y1="18" x2="12" y2="12"/>
           <polyline points="9,15 12,12 15,15"/>
         </svg>
-        <div class="upload-text">Subir PDF</div>
-        <div class="upload-hint">o arrastra aquí</div>
+        <div class="upload-text" id="uploadText">Upload PDF</div>
+        <div class="upload-hint" id="uploadHint">or drag here</div>
       </div>
 
       <div class="file-info" id="fileInfo" style="display:none">
@@ -56,18 +56,18 @@
       </div>
 
       <div id="controls" style="display:none">
-        <div class="section-label">Navegación</div>
+        <div class="section-label" id="navSectionLabel">Navigation</div>
         <div class="page-nav">
           <button class="nav-btn" id="btnPrev">‹</button>
           <div class="page-counter"><span id="currentPage">1</span> / <span id="totalPages">1</span></div>
           <button class="nav-btn" id="btnNext">›</button>
         </div>
         <div class="goto-row">
-          <span>Ir a página</span>
+          <span id="gotoPageLabel">Go to page</span>
           <input type="number" id="gotoPage" class="goto-input" min="1" value="1">
         </div>
 
-        <div class="section-label" style="margin-top:16px">Zoom</div>
+        <div class="section-label" style="margin-top:16px" id="zoomSectionLabel">Zoom</div>
         <div class="zoom-row">
           <button class="zoom-btn" id="btnZoomOut">−</button>
           <span class="zoom-val" id="zoomValue">125%</span>
@@ -81,50 +81,50 @@
           <button class="zp" data-z="2">200%</button>
         </div>
 
-        <div class="copy-tip">
+        <div class="copy-tip" id="copyTipText">
           <svg viewBox="0 0 16 16" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
             <path d="M8 1L2 4v4c0 3.5 2.5 6.5 6 7.5 3.5-1 6-4 6-7.5V4L8 1z"/>
           </svg>
-          Hover = resalta bloque<br>Click = copia al instante
+          <span id="copyTipLine1">Hover = highlight block</span><br><span id="copyTipLine2">Click = copy instantly</span>
         </div>
 
         <!-- Selection mode selector -->
-        <div class="section-label" style="margin-top:16px">Modo de Selección</div>
+        <div class="section-label" style="margin-top:16px" id="modeSectionLabel">Selection Mode</div>
         <div class="mode-selector" id="modeSelector">
-          <button class="mode-btn active" data-mode="block" title="Bloque de texto">
-            <span class="mode-icon">⬛</span>Bloque
+          <button class="mode-btn active" data-mode="block" title="Text block">
+            <span class="mode-icon">⬛</span><span class="mode-label" id="modeLabelBlock">Block</span>
           </button>
-          <button class="mode-btn" data-mode="paragraph" title="Párrafo (mismo formato)">
-            <span class="mode-icon">¶</span>Párrafo
+          <button class="mode-btn" data-mode="paragraph" title="Paragraph (same format)">
+            <span class="mode-icon">¶</span><span class="mode-label" id="modeLabelParagraph">Paragraph</span>
           </button>
-          <button class="mode-btn" data-mode="line" title="Línea de texto">
-            <span class="mode-icon">▬</span>Línea
+          <button class="mode-btn" data-mode="line" title="Text line">
+            <span class="mode-icon">▬</span><span class="mode-label" id="modeLabelLine">Line</span>
           </button>
-          <button class="mode-btn" data-mode="word" title="Palabra individual">
-            <span class="mode-icon">◾</span>Palabra
+          <button class="mode-btn" data-mode="word" title="Individual word">
+            <span class="mode-icon">◾</span><span class="mode-label" id="modeLabelWord">Word</span>
           </button>
-          <button class="mode-btn" data-mode="free" title="Selección libre con mouse">
-            <span class="mode-icon">✏️</span>Libre
+          <button class="mode-btn" data-mode="free" title="Free mouse selection">
+            <span class="mode-icon">✏️</span><span class="mode-label" id="modeLabelFree">Free</span>
           </button>
         </div>
 
         <!-- Content Filters -->
-        <div class="section-label" style="margin-top:16px">Filtros de Extracción</div>
+        <div class="section-label" style="margin-top:16px" id="filtersSectionLabel">Extraction Filters</div>
         <div class="filter-container">
-          <button class="filter-btn" data-filter="onlyNums" title="Extraer únicamente números">Solo Números</button>
-          <button class="filter-btn" data-filter="noNums" title="Ignorar todos los números">Sin Números</button>
-          <button class="filter-btn" data-filter="noSpecial" title="Solo letras y números (sin símbolos)">Sin Símbolos</button>
+          <button class="filter-btn" data-filter="onlyNums" title="Extract numbers only" id="filterOnlyNums">Numbers Only</button>
+          <button class="filter-btn" data-filter="noNums" title="Ignore all numbers" id="filterNoNums">No Numbers</button>
+          <button class="filter-btn" data-filter="noSpecial" title="Only letters and numbers (no symbols)" id="filterNoSpecial">No Symbols</button>
         </div>
 
         <div class="stat-row">
           <span class="stat-num" id="statCopied">0</span>
-          <span class="stat-lbl">textos copiados</span>
+          <span class="stat-lbl" id="copiedStatLabel">copied texts</span>
         </div>
       </div>
     </aside>
 
     <main class="viewer-main" id="viewerMain">
-      <button class="sidebar-restore" id="btnShowSidebar" type="button" title="Mostrar barra lateral" aria-label="Mostrar barra lateral" tabindex="-1">
+      <button class="sidebar-restore" id="btnShowSidebar" type="button" title="Show sidebar" aria-label="Show sidebar" tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="17" height="17">
           <path d="M9 18l6-6-6-6"/>
         </svg>
@@ -142,8 +142,8 @@
             <circle cx="78" cy="82" r="18" fill="#0a0f1a" stroke="rgba(16,185,129,0.3)" stroke-width="1.5"/>
             <path d="M71 82l5 5 10-10" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <h1 class="welcome-title">PDF Auto-Copy Viewer</h1>
-          <p class="welcome-desc">Sube un PDF, visualízalo exactamente como luce y selecciona texto para copiarlo automáticamente.</p>
+          <h1 class="welcome-title" id="welcomeTitle">PDF Auto-Copy Viewer</h1>
+          <p class="welcome-desc" id="welcomeDesc">Upload a PDF, view it exactly as rendered, and select text to auto-copy.</p>
           <button class="btn-upload-main" id="btnUploadMain">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
@@ -151,17 +151,17 @@
               <line x1="12" y1="18" x2="12" y2="12"/>
               <polyline points="9,15 12,12 15,15"/>
             </svg>
-            Seleccionar PDF
+            <span id="btnUploadMainLabel">Select PDF</span>
           </button>
-          <div class="welcome-or">o arrastra y suelta aquí</div>
+          <div class="welcome-or" id="welcomeOrText">or drag and drop here</div>
           <div class="welcome-feats">
-            <div class="feat">🔒 100% local — no se sube a ningún servidor</div>
-            <div class="feat">✅ Auto-copy al seleccionar texto</div>
-            <div class="feat">🎨 Formato visual exacto del PDF preservado</div>
+            <div class="feat" id="welcomeFeatLocal">🔒 100% local — never uploaded to any server</div>
+            <div class="feat" id="welcomeFeatAutoCopy">✅ Auto-copy on text selection</div>
+            <div class="feat" id="welcomeFeatVisual">🎨 Exact PDF visual formatting preserved</div>
           </div>
           
           <div class="recents-section" id="recentsSection" style="display:none; width:100%; margin-top:24px;">
-            <div class="recents-title">Documentos Recientes</div>
+            <div class="recents-title" id="recentsTitle">Recent Documents</div>
             <div class="recents-list" id="recentsList"></div>
           </div>
         </div>
@@ -169,15 +169,15 @@
 
       <div class="loading-screen" id="loadingScreen" style="display:none">
         <div class="spinner"></div>
-        <div class="loading-text">Procesando PDF...</div>
-        <div class="loading-sub" id="loadingProgress">Preparando páginas</div>
+        <div class="loading-text" id="loadingMainText">Processing PDF...</div>
+        <div class="loading-sub" id="loadingProgress">Preparing pages</div>
       </div>
 
       <div class="eraser-ui" id="eraserUI">
-        <span>Modo Borrador:</span>
-        <button class="eraser-btn" data-mode="paragraph">¶ Párrafo</button>
-        <button class="eraser-btn" data-mode="line">▬ Línea</button>
-        <button class="eraser-btn active" data-mode="word">◾ Palabra</button>
+        <span id="eraserModeLabel">Eraser Mode:</span>
+        <button class="eraser-btn" data-mode="paragraph">¶ <span id="eraserParagraphLabel">Paragraph</span></button>
+        <button class="eraser-btn" data-mode="line">▬ <span id="eraserLineLabel">Line</span></button>
+        <button class="eraser-btn active" data-mode="word">◾ <span id="eraserWordLabel">Word</span></button>
       </div>
 
       <div class="pdf-container" id="pdfContainer" style="display:none">
@@ -188,7 +188,7 @@
 
   <div class="copy-toast" id="copyToast">
     <svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
-    <span id="toastText">Copiado</span>
+    <span id="toastText">Copied</span>
   </div>
 
   <script src="pdf-viewer.js"></script>

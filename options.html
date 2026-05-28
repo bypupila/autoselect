@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoSelect Pro — Opciones</title>
+  <title>AutoSelect Pro — Options</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
@@ -151,6 +151,28 @@
               </label>
             </div>
           </div>
+          <div class="form-group">
+            <div class="form-row">
+              <div>
+                <label class="form-label">Notificación del sistema</label>
+                <div class="form-desc">Muestra una notificación del SO cada vez que copia</div>
+              </div>
+              <label class="toggle" for="desktopNotificationsEnabled">
+                <input type="checkbox" id="desktopNotificationsEnabled" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Language</label>
+            <div class="form-desc">Default is English. You can switch to Spanish anytime.</div>
+            <div class="input-row">
+              <select id="uiLanguage" class="mini-select" style="width:100%">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+              </select>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -221,9 +243,9 @@
           <div class="card-title">Vista previa</div>
           <div class="preview-area">
             <p class="preview-text">
-              Selecciona este texto para ver el efecto del highlight en acción.
-              <span class="preview-highlight" id="previewHighlight">Este texto mostrará el color elegido.</span>
-              La extensión copiará automáticamente lo que selecciones.
+              <span id="previewLeadText">Select this text to preview the highlight effect.</span>
+              <span class="preview-highlight" id="previewHighlight">This text will show the selected color.</span>
+              <span id="previewTailText">The extension will copy automatically what you select.</span>
             </p>
             <div class="preview-checkmark" id="previewCheckmark">
               <div class="preview-check-icon">
@@ -341,15 +363,15 @@
 
           <div class="license-form-grid">
             <label class="license-field">
-              <span>Email de compra</span>
+              <span id="licenseEmailLabel">Email de compra</span>
               <input type="email" id="licenseEmailInput" placeholder="tu@email.com" class="text-input">
             </label>
             <label class="license-field">
-              <span>License key</span>
+              <span id="licenseKeyLabel">License key</span>
               <input type="text" id="licenseKeyInput" placeholder="Polar license key" class="text-input">
             </label>
             <label class="license-field wide">
-              <span>Código promocional</span>
+              <span id="couponCodeLabel">Código promocional</span>
               <input type="text" id="couponCodeInput" placeholder="Opcional" class="text-input">
             </label>
           </div>
@@ -368,12 +390,22 @@
         <div class="card license-card">
           <div>
             <div class="card-title">Configuración avanzada</div>
-            <p class="license-copy">Solo necesitas tocar esto si cambias el backend o las URLs legales antes de publicar.</p>
+            <p class="license-copy">Solo necesitas tocar esto si cambias el backend, URLs legales o analytics antes de publicar.</p>
           </div>
           <label class="license-field wide">
-            <span>API Base URL</span>
+            <span id="apiBaseUrlLabel">API Base URL</span>
             <input type="text" id="apiBaseUrl" placeholder="https://api.tudominio.com" class="text-input">
           </label>
+          <div class="license-form-grid">
+            <label class="license-field">
+              <span>GA4 Measurement ID</span>
+              <input type="text" id="ga4MeasurementId" placeholder="G-XXXXXXXXXX" class="text-input">
+            </label>
+            <label class="license-field">
+              <span>GA4 API Secret</span>
+              <input type="password" id="ga4ApiSecret" placeholder="Measurement Protocol API secret" class="text-input">
+            </label>
+          </div>
           <div class="license-form-grid">
             <label class="license-field">
               <span>Checkout Early Bird</span>
@@ -384,15 +416,15 @@
               <input type="text" id="checkoutLifetimeUrl" placeholder="https://polar.sh/..." class="text-input">
             </label>
             <label class="license-field">
-              <span>Checkout Anual</span>
+              <span id="checkoutAnnualLabel">Checkout Anual</span>
               <input type="text" id="checkoutAnnualUrl" placeholder="https://polar.sh/..." class="text-input">
             </label>
             <label class="license-field">
-              <span>Política de Privacidad</span>
+              <span id="privacyUrlLabel">Política de Privacidad</span>
               <input type="text" id="privacyUrl" placeholder="https://..." class="text-input">
             </label>
             <label class="license-field">
-              <span>Términos</span>
+              <span id="termsUrlLabel">Términos</span>
               <input type="text" id="termsUrl" placeholder="https://..." class="text-input">
             </label>
           </div>

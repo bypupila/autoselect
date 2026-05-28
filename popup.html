@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,23 +36,24 @@
     <!-- Status Banner -->
     <div class="status-banner" id="statusBanner">
       <div class="status-dot" id="statusDot"></div>
-      <span id="statusText">Activo — selecciona cualquier texto para copiar</span>
+      <span id="statusText">Active — select text to copy automatically</span>
     </div>
+    <div class="health-notice" id="healthNotice" style="display:none"></div>
 
     <div class="section">
-      <div class="section-title">Plan</div>
+      <div class="section-title" id="planSectionTitle">Plan</div>
       <div class="quick-settings">
         <div class="setting-row">
           <div class="setting-info">
-            <div class="setting-name" id="planName">Free</div>
-            <div class="setting-desc" id="planMeta">50 copias automáticas por día</div>
+            <div class="setting-name" id="planName">FREE</div>
+            <div class="setting-desc" id="planMeta">Current plan FREE · works right after install</div>
           </div>
           <div id="planBadge" class="btn-pdf-badge" style="position:static">FREE</div>
         </div>
         <div class="plan-actions" id="planActions">
-          <button class="plan-action-btn trial" id="btnStartTrial">Probar 3 días</button>
-          <button class="plan-action-btn activate" id="btnActivatePro">Activar Pro</button>
-          <button class="plan-action-btn manage" id="btnManageLicense" style="display:none">Gestionar licencia</button>
+          <button class="plan-action-btn trial" id="btnStartTrial">Try 3 days</button>
+          <button class="plan-action-btn activate" id="btnActivatePro">Upgrade to Pro</button>
+          <button class="plan-action-btn manage" id="btnManageLicense" style="display:none">Manage license</button>
         </div>
       </div>
     </div>
@@ -61,30 +62,30 @@
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-value" id="copyCount">0</div>
-        <div class="stat-label">Copiados hoy</div>
+        <div class="stat-label" id="copiedTodayLabel">Copied today</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-card">
         <div class="stat-value" id="sessionCount">0</div>
-        <div class="stat-label">Esta sesión</div>
+        <div class="stat-label" id="sessionLabel">This session</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat-card">
         <div class="stat-indicator" id="colorIndicator"></div>
-        <div class="stat-label">Color activo</div>
+        <div class="stat-label" id="activeColorLabel">Active color</div>
       </div>
     </div>
 
     <!-- Quick Settings -->
     <div class="section">
-      <div class="section-title">Configuración rápida</div>
+      <div class="section-title" id="quickSectionTitle">Quick settings</div>
 
       <div class="quick-settings">
         <!-- Highlight Color -->
         <div class="setting-row">
           <div class="setting-info">
-            <div class="setting-name">Color de selección</div>
-            <div class="setting-desc">Highlight al copiar</div>
+            <div class="setting-name" id="selectionColorName">Selection color</div>
+            <div class="setting-desc" id="selectionColorDesc">Highlight on copy</div>
           </div>
           <div class="color-picker-wrapper">
             <div class="color-preview" id="colorPreview"></div>
@@ -95,25 +96,36 @@
         <!-- Checkmark Position -->
         <div class="setting-row">
           <div class="setting-info">
-            <div class="setting-name">Indicador ✓</div>
-            <div class="setting-desc">Dónde aparece</div>
+            <div class="setting-name" id="indicatorName">Indicator ✓</div>
+            <div class="setting-desc" id="indicatorDesc">Where it appears</div>
           </div>
           <select id="quickPosition" class="mini-select">
             <option value="cursor">Cursor</option>
-            <option value="corner">Esquina</option>
-            <option value="both">Ambos</option>
-            <option value="none">Ninguno</option>
+            <option value="corner">Corner</option>
+            <option value="both">Both</option>
+            <option value="none">None</option>
           </select>
         </div>
 
         <!-- Sound Toggle -->
         <div class="setting-row">
           <div class="setting-info">
-            <div class="setting-name">Sonido</div>
-            <div class="setting-desc">Tono al copiar</div>
+            <div class="setting-name" id="soundName">Sound</div>
+            <div class="setting-desc" id="soundDesc">Tone on copy</div>
           </div>
           <label class="mini-toggle" for="soundToggle">
             <input type="checkbox" id="soundToggle">
+            <span class="mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name" id="notificationName">Notification</div>
+            <div class="setting-desc" id="notificationDesc">System alert on copy</div>
+          </div>
+          <label class="mini-toggle" for="desktopNotificationToggle">
+            <input type="checkbox" id="desktopNotificationToggle">
             <span class="mini-slider"></span>
           </label>
         </div>
@@ -122,7 +134,7 @@
 
     <!-- Last Copied Preview -->
     <div class="last-copied" id="lastCopied" style="display:none">
-      <div class="last-copied-label">Último copiado</div>
+      <div class="last-copied-label" id="lastCopiedLabel">Last copied</div>
       <div class="last-copied-text" id="lastCopiedText"></div>
     </div>
 
@@ -135,8 +147,8 @@
         <line x1="16" y1="17" x2="8" y2="17"/>
         <polyline points="10,9 9,9 8,9"/>
       </svg>
-      Abrir PDF Viewer
-      <span class="btn-pdf-badge">NUEVO</span>
+      <span id="pdfViewerLabel">Open PDF Viewer</span>
+      <span class="btn-pdf-badge" id="pdfNewBadge">NEW</span>
     </button>
 
     <!-- Footer -->
@@ -146,7 +158,7 @@
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/>
         </svg>
-        Opciones avanzadas
+        <span id="optionsBtnLabel">Advanced options</span>
       </button>
       <div class="version">v1.1.1</div>
     </footer>

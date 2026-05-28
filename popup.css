@@ -184,6 +184,7 @@ body {
   color: #6ee7b7;
   font-weight: 400;
   transition: all 0.3s ease;
+  line-height: 1.35;
 }
 
 .status-banner.inactive {
@@ -211,6 +212,17 @@ body {
 @keyframes pulse-dot {
   0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
   50%       { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
+}
+
+.health-notice {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #fcd34d;
+  white-space: pre-line;
 }
 
 /* ─── Stats Row ──────────────────────────────────────────────────── */
